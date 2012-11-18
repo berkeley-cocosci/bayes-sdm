@@ -2,7 +2,7 @@ import numpy as np
 
 class SDM(object):
 
-    def __init__(n, m, D, seed=0):
+    def __init__(self, n, m, D, seed=0):
         """Initialize a SDM.
 
         Parameters
@@ -28,7 +28,7 @@ class SDM(object):
         # counter matrix: stores contents of the addressed locations
         self.C = np.zeros((n, m))
 
-    def _select(address):
+    def _select(self, address):
         """Select addresses with the Hamming radius(self.D) of the
         given address
 
@@ -41,11 +41,11 @@ class SDM(object):
         theta : binary vector of size m
 
         """
-        x = np.dot(self.A, a)
+        x = np.dot(self.A, address)
         theta = ((0.5*(self.n-x)) <= self.D).astype('f8')
         return theta
 
-    def read(address):
+    def read(self, address):
         """Read the data at the location indicated by the given
         address.
 
@@ -63,7 +63,7 @@ class SDM(object):
         data = (h > 0) + (h < 0)
         return data
 
-    def write(address, data):
+    def write(self, address, data):
         """Write the given data at the location indicated by the given
         address.
 
@@ -76,7 +76,7 @@ class SDM(object):
         s = self._select(address)
         C += np.dot(data[:, None], s[None, :])
 
-    def writeM(addresses, data):
+    def writeM(self, addresses, data):
         """Write M vectors at data at the locations indicated by the
         given M addresses.
 
