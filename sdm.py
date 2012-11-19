@@ -82,10 +82,21 @@ class SDM(object):
 
         Parameters
         ----------
-        addresses : matrix of size (M, n)
-        data      : matrix of size (M, n)
+        addresses : matrix of size (n, M)
+        data      : matrix of size (n, M)
 
         """
-        s = self._select(addresses.T)
-        c = np.sum(data[:, :, None] * s.T[:, None, :], axis=0)
+        s = self._select(addresses)
+        c = np.sum(data[:, None] * s[None, :], axis=2)
+        self.C += c
+
+    def clear(self, address):
+        data = -self.read(address)
+        s = self._select(address)
+        self.C += np.dot(data[:, None], s[None, :])
+
+    def clearM(self, addresses):
+        data = -self.read(addresses)
+        s = self._select(addresses)
+        c = np.sum(data[:, None] * s[None, :], axis=2)
         self.C += c
