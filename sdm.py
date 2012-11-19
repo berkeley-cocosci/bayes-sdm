@@ -7,9 +7,9 @@ class SDM(object):
 
         Parameters
         ----------
-        n : length of inputs/addresses
-        m : number of addresses/storage locations
-        D : hamming radius
+        n    : length of inputs/addresses
+        m    : number of addresses/storage locations
+        D    : hamming radius
         seed : random number generator seed
 
         """
@@ -60,7 +60,7 @@ class SDM(object):
         """
         s = self._select(address)
         h = np.dot(self.C, s)
-        data = (h > 0) + (h < 0)
+        data = (h > 0).astype('f8') - (h < 0).astype('f8')
         return data
 
     def write(self, address, data):
@@ -70,11 +70,11 @@ class SDM(object):
         Parameters
         ----------
         address : vector of size n
-        data : vector of size n
+        data    : vector of size n
 
         """
         s = self._select(address)
-        C += np.dot(data[:, None], s[None, :])
+        self.C += np.dot(data[:, None], s[None, :])
 
     def writeM(self, addresses, data):
         """Write M vectors at data at the locations indicated by the
@@ -83,8 +83,9 @@ class SDM(object):
         Parameters
         ----------
         addresses : matrix of size (M, n)
-        data : matrix of size (M, n)
+        data      : matrix of size (M, n)
 
         """
         s = self._select(addresses.T)
-        C += np.sum(data[:, :, None], s[:, None, :], axis=0)
+        c = np.sum(data[:, :, None] * s.T[:, None, :], axis=0)
+        self.C += c
