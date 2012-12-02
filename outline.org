@@ -1,0 +1,67 @@
+#+TITLE: An initial exploration of Sparse Distributed Memory systems as a mechanism of Bayesian inference
+#+AUTHOR: Joshua T. Abbott and Jessica B. Hamrick
+#+DATE: 12/01/2012
+
+* Tasks
+
+** TODO Write introduction (Josh)
+DEADLINE: <2012-12-06 Thu>
+
+** TODO Implement the RBF (Josh)
+DEADLINE: <2012-12-06 Thu>
+
+** TODO Transition the Hopfield code (Jess)
+DEADLINE: <2012-12-06 Thu>
+
+** TODO Write boilerplate simulation code for comparison metrics (Jess)
+DEADLINE: <2012-12-06 Thu>
+
+** TODO Write comparison section of the document (Jess)
+DEADLINE: <2012-12-06 Thu>
+
+** TODO Write "Models" section and do math (Josh)
+DEADLINE: <2012-12-06 Thu>
+
+** Write the discussion (Josh and Jess)
+
+* Introduction
+** introduce main motivation
+*** exemplar models / importance sampling for Bayes
+*** previous implementations with RBF / spiking neurons
+*** how would this be done in an SDM?
+*** interesting because the RBF network is not cognitively satisfying
+**** all grandmother cells
+**** not robust
+
+* Models
+Talk about how each model works mathematically, say we implemented it
+in Python, code in supplementary material
+
+** Hopfield
+** RBF
+** SDM
+
+* Comparison
+
+** Parameters
+*** size of address space (think this compares to number of hidden units in others)
+*** # exemplars
+*** % bits corrupt
+
+** storage capacity
+** retrieval using corrupted and uncorrupted inputs
+** retrieval of prototype
+** retrieval of sequences
+** difference between addresses and data
+
+* Discussion
+
+** SDM is the best
+only the only model that is both robust to noise/storage capacity and
+sophisticated enough to behave in various ways
+
+** Future directions
+*** probabilistic interpretations
+*** figure out the encoding for importance sampling
+*** how close does it have to be to the delta function?
+
