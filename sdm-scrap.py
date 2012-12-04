@@ -3,6 +3,8 @@
 
 # <codecell>
 
+import numpy as np
+import matplotlib.pyplot as plt
 import sdm as sdm
 from util import corrupt, plot_io
 
@@ -44,14 +46,6 @@ for i in xrange(7):
 
 # <codecell>
 
-reload(sdm)
-b = sdm.f2b(2.000001)
-print b
-f = sdm.b2f(b)
-print f
-
-# <codecell>
-
 c = 5 # amount of bits to corrupt
 n = 15 # number of exemplars
 
@@ -81,8 +75,4 @@ for i in xrange(1):
     plt.figure()
     plot_io(ex.reshape((10, 10), order='F'), proto.reshape((10, 10), order='F'))
     ex = proto.copy()
-
-# <codecell>
-
-inputs.shape
 
