@@ -34,3 +34,37 @@ def plot_io(input, output):
     plt.xticks([], [])
     plt.yticks([], [])
     plt.title("Output")
+
+def random_input(n, k=0, rso=None):
+    """Generate `k` random binary vectors of length `n`. 
+
+    If k=0, then the output will be a vector of shape (n,). If k>0,
+    then the output will be a matrix of shape (n, k).
+
+    Parameters
+    ----------
+    n   : vector length
+    k   : number of vectors (default=0)
+    rso : random number object (default=None)
+
+    Returns
+    -------
+    out : np.ndarray of shape (n,) or (n, k)
+      
+    """
+
+    # determine the size of the array
+    if k == 0:
+        size = (n,)
+    elif k > 0:
+        size = (n, k)
+    else:
+        raise ValueError("k < 0")
+
+    # generate random vectors
+    if rso:
+        out = rso.randint(0, 2, size=size)
+    else:
+        out = np.random.randint(0, 2, size=size)
+
+    return out
