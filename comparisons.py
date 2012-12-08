@@ -25,7 +25,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.stats
 import sdm as sdm
-#import hopfield
+import hopfield as hop
 import util as util
 import metrics as metrics
 
@@ -54,6 +54,12 @@ n = 100
 # hamming distance encompasses 2.5% of addresses
 D = float((n / 2.) - (np.sqrt(n*(0.5**2)) * 1.96))
 
+# error thresholds
+thresh = np.array([0, 0.01, 0.025, 0.05])
+
+# number of simulations to run
+iters = 100
+
 # <headingcell level=1>
 
 # Uncorrupted Storage Capacity
@@ -61,34 +67,45 @@ D = float((n / 2.) - (np.sqrt(n*(0.5**2)) * 1.96))
 # <codecell>
 
 # How many random, uncorrelated inputs can the SDM store?
-M = np.arange(250, 1+2000, 250)
-thresh = np.array([0, 0.01, 0.025, 0.05])
-iters = 100
-
-capacity = np.empty((thresh.size, M.size))
+M = np.arange(100, 1+1000, 100)
+sdm_capacity = np.empty((thresh.size, M.size))
 for tidx, t in enumerate(thresh):
     k = 1
     for midx, m in enumerate(M):
 	k = metrics.test_capacity(
-	    n, int(m), D, k=k, iters=iters, 
+	    (int(n), int(m), float(D)), 
+	    k=int(k), iters=int(iters), 
 	    thresh=float(t), verbose=True)
-	capacity[tidx, midx] = k-1
+	sdm_capacity[tidx, midx] = k-1
 	print "m=%d : capacity is %d (%d%% error tolerance)" % (m, k-1, t*100)
 
 # <codecell>
 
-import joblib
-joblib.Memory?
+# How many random, uncorrelated inputs can the Hopfield net store?
+hop_capacity = np.empty(thresh.size)
+k = 1
+for tidx, t in enumerate(thresh):
+    k = metrics.test_capacity(
+	int(n), k=int(k), iters=int(iters), 
+	thresh=float(t), verbose=True)
+    hop_capacity[tidx] = k-1
+    print "capacity is %d (%d%% error tolerance)" % (k-1, t*100)
 
 # <codecell>
 
-lot the storage capacity as a function of address space size
+# plot the storage capacity as a function of address space size
 plt.clf()
+colors = ['b', 'g', 'r', 'c']
 for tidx, t in enumerate(thresh):
-    plt.plot(M, capacity[tidx], label='%d%% err. tol.' % (t*100))
+    plt.plot(M, hop_capacity[tidx, None]*np.ones_like(M), 
+	     label='Hopfield %.1f%% err. tol.' % (t*100), 
+	     color=colors[tidx], linestyle='--')
+    plt.plot(M, sdm_capacity[tidx], 
+	     label='SDM %.1f%% err. tol.' % (t*100), 
+	     color=colors[tidx], linestyle='-')
 plt.xlabel("M (# addresses)")
 plt.ylabel("Capacity (# uncorrupted items)")
-plt.title("SDM Capacity (N=%d)" % n)
+plt.title("SDM and Hopfield Capacities (N=%d)" % n)
 plt.legend(loc=0)
 
 # <codecell>
@@ -96,16 +113,16 @@ plt.legend(loc=0)
 # plot the utilization as a function of address space size
 plt.clf()
 for tidx, t in enumerate(thresh):
+    plt.plot(M, 100*hop_capacity[tidx, None]*np.ones_like(M) / float(n), 
+	     label='Hopfield %.1f%% err. tol.' % (t*100),
+	     color=colors[tidx], linestyle='--')
     plt.plot(M, 100 * capacity[tidx] / M.astype('f8'),
-	     label='%d%% err. tol.' % (t*100))
+	     label='SDM %.1f%% err. tol.' % (t*100),
+	     color=colors[tidx], linestyle='-')
 plt.xlabel("M (# addresses)")
-plt.ylabel("Percent Utilization (capacity / M)")
-plt.title("SDM Utilization (N=%d)" % n)
+plt.ylabel("Percent Utilization")
+plt.title("SDM and Hopfield Utilizations (N=%d)" % n)
 plt.legend(loc=0)
-
-# <codecell>
-
-# How many random, uncorrelated inputs can the Hopfield net store?
 
 # <headingcell level=1>
 

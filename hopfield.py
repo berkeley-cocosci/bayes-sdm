@@ -10,7 +10,7 @@ import numpy as np
 
 class hopnet(object):
 
-    def __init__(self,input=None):
+    def __init__(self, input=None):
         """Initialize a Hopfield network
 
         Parameters
@@ -54,6 +54,13 @@ class hopnet(object):
         idx = np.random.randint(self.numNeurons, size=iters)
         data[idx]= 2*(np.dot(self.T[idx,:],data)>0) -1
 
-
         return data
 
+
+    def readM(self, addresses, iters):
+        M = addresses.shape[1]
+        data = np.empty(addresses.shape)
+        for i in xrange(M):
+            address = addresses[:, i]
+            data[:, i] = self.read(iters=iters, address=address)
+        return data
