@@ -2,7 +2,7 @@
 
 Authors:
   Jessica Hamrick (jhamrick@berkeley.edu)
-  Josh Abbott (josh.abbott@berkeley.edu)
+  Josh Abbott (joshua.abbott@berkeley.edu)
 
 """
 

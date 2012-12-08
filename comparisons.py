@@ -27,10 +27,7 @@ import scipy.stats
 import sdm as sdm
 #import hopfield as hopfield
 import util as util
-
-# <codecell>
-
-rso = np.random.RandomState(0)
+import metrics as metrics
 
 # <headingcell level=1>
 
@@ -52,7 +49,7 @@ rso = np.random.RandomState(0)
 # <codecell>
 
 # length of inputs
-n = 100
+n = 20
 
 # hamming distance encompasses 2.5% of addresses
 D = (n / 2.) - (np.sqrt(n*(0.5**2)) * 1.96) 
@@ -64,24 +61,42 @@ D = (n / 2.) - (np.sqrt(n*(0.5**2)) * 1.96)
 # <codecell>
 
 # How many random, uncorrelated inputs can the SDM store?
-M = [100, 200, 400, 600, 800, 1000]
-capacity = []
-for m in M:
-    rso.seed(0)
-    mem = sdm.SDM(n, m, D, seed=rso)
-    corruption = test_uncorrelated_capacity(mem, iters=100, rso=rso, verbose=False)
-    capacity.append(corruption.shape[0]-1)
-    print "m=%d : capacity is %d" % (M, capacity[-1])
+M = np.arange(250, 1+2000, 250)
+thresh = np.array([0, 0.01, 0.05, 0.10])
+iters = 10
+
+capacity = np.empty((thresh.size, M.size))
+for tidx, t in enumerate(thresh):
+    k = 1
+    for midx, m in enumerate(M):
+	k = metrics.test_capacity(
+	    n, m, D, k=k, maxk=10, iters=iters, thresh=t, 
+	    seed=0, verbose=True)
+	capacity[tidx, midx] = k-1
+	print "m=%d : capacity is %d (%d%% error tolerance)" % (m, k-1, t*100)
 
 # <codecell>
 
-# plot the storage capacity as a function of address space size
+lot the storage capacity as a function of address space size
 plt.clf()
-plt.plot(M, capacity)
-plt.xticks(M, M)
-plt.xlabel("# addresses")
-plt.ylabel("# items")
-plt.title("Number of items stored in the SDM without corruption")
+for tidx, t in enumerate(thresh):
+    plt.plot(M, capacity[tidx], label='%d%% err. tol.' % (t*100))
+plt.xlabel("M (# addresses)")
+plt.ylabel("Capacity (# uncorrupted items)")
+plt.title("SDM Capacity (N=%d)" % n)
+plt.legend(loc=0)
+
+# <codecell>
+
+# plot the utilization as a function of address space size
+plt.clf()
+for tidx, t in enumerate(thresh):
+    plt.plot(M, 100 * capacity[tidx] / M.astype('f8'),
+	     label='%d%% err. tol.' % (t*100))
+plt.xlabel("M (# addresses)")
+plt.ylabel("Percent Utilization (capacity / M)")
+plt.title("SDM Utilization (N=%d)" % n)
+plt.legend(loc=0)
 
 # <codecell>
 
