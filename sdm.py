@@ -1,3 +1,11 @@
+"""sdm.py -- Sparse Distributed Memory
+
+Authors:
+  Jessica Hamrick (jhamrick@berkeley.edu)
+  Josh Abbott (josh.abbott@berkeley.edu)
+
+"""
+
 import numpy as np
 
 class SDM(object):
@@ -20,14 +28,24 @@ class SDM(object):
         self.D = D
 
         # random number generator
-        rso = np.random.RandomState(seed)
+        if isinstance(seed, int):
+            rso = np.random.RandomState(seed)
+        else:
+            rso = seed
         
-        # address matrix: matrix of random +/- 1s, where the kth row
+        # address matrix: random binary matrix, where the kth row
         # is the address of the kth storage location
-        self.A = (rso.randint(0, 2, (m, n)) * 2) - 1
+        self.A = rso.randint(0, 2, (m, n, 1))
+        self._A = self.A.copy()
         # counter matrix: stores contents of the addressed locations
         self.C = np.zeros((n, m))
+        self._C = self.C.copy()
 
+    def reset(self):
+        """Reset the SDM to it's original state."""
+        self.A = self._A.copy()
+        self.C = self._C.copy()
+        
     def _select(self, address):
         """Select addresses with the Hamming radius(self.D) of the
         given address
@@ -41,9 +59,28 @@ class SDM(object):
         theta : binary vector of size m
 
         """
-        x = np.dot(self.A, address)
-        theta = ((0.5*(self.n-x)) <= self.D).astype('f8')
+        x = np.sum(self.A ^ address, axis=1)
+        theta = x <= self.D
         return theta
+
+    def readM(self, addresses):
+        """Read the data at the locations indicated by the given M
+        addresses.
+
+        Parameters
+        ----------
+        addresses : array of size (n, M)
+
+        Returns
+        -------
+        data : array of size (n, M)
+
+        """
+        s = self._select(addresses)
+        h = np.dot(self.C, s)
+        data = np.zeros(h.shape, dtype='i4')
+        data[h > 0] = 1
+        return data
 
     def read(self, address):
         """Read the data at the location indicated by the given
@@ -58,10 +95,23 @@ class SDM(object):
         data : vector of size n
 
         """
-        s = self._select(address)
-        h = np.dot(self.C, s)
-        data = (h > 0).astype('f8') - (h < 0).astype('f8')
+        data = self.readM(address[:, None])[:, 0]
         return data
+
+    def writeM(self, addresses, data):
+        """Write M vectors of `data` at the locations indicated by the
+        given M `addresses`.
+
+        Parameters
+        ----------
+        addresses : matrix of size (n, M)
+        data      : matrix of size (n, M)
+
+        """
+        s = self._select(addresses)
+        w = (data * 2) - 1
+        c = np.sum(w[:, None] * s[None, :], axis=2)
+        self.C += c
 
     def write(self, address, data):
         """Write the given data at the location indicated by the given
@@ -73,30 +123,4 @@ class SDM(object):
         data    : vector of size n
 
         """
-        s = self._select(address)
-        self.C += np.dot(data[:, None], s[None, :])
-
-    def writeM(self, addresses, data):
-        """Write M vectors at data at the locations indicated by the
-        given M addresses.
-
-        Parameters
-        ----------
-        addresses : matrix of size (n, M)
-        data      : matrix of size (n, M)
-
-        """
-        s = self._select(addresses)
-        c = np.sum(data[:, None] * s[None, :], axis=2)
-        self.C += c
-
-    def clear(self, address):
-        data = -self.read(address)
-        s = self._select(address)
-        self.C += np.dot(data[:, None], s[None, :])
-
-    def clearM(self, addresses):
-        data = -self.read(addresses)
-        s = self._select(addresses)
-        c = np.sum(data[:, None] * s[None, :], axis=2)
-        self.C += c
+        self.writeM(address[:, None], data[:, None])
