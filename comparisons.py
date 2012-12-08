@@ -25,7 +25,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.stats
 import sdm as sdm
-#import hopfield as hopfield
+#import hopfield
 import util as util
 import metrics as metrics
 
@@ -49,10 +49,10 @@ import metrics as metrics
 # <codecell>
 
 # length of inputs
-n = 20
+n = 100
 
 # hamming distance encompasses 2.5% of addresses
-D = (n / 2.) - (np.sqrt(n*(0.5**2)) * 1.96) 
+D = float((n / 2.) - (np.sqrt(n*(0.5**2)) * 1.96))
 
 # <headingcell level=1>
 
@@ -62,18 +62,23 @@ D = (n / 2.) - (np.sqrt(n*(0.5**2)) * 1.96)
 
 # How many random, uncorrelated inputs can the SDM store?
 M = np.arange(250, 1+2000, 250)
-thresh = np.array([0, 0.01, 0.05, 0.10])
-iters = 10
+thresh = np.array([0, 0.01, 0.025, 0.05])
+iters = 100
 
 capacity = np.empty((thresh.size, M.size))
 for tidx, t in enumerate(thresh):
     k = 1
     for midx, m in enumerate(M):
 	k = metrics.test_capacity(
-	    n, m, D, k=k, maxk=10, iters=iters, thresh=t, 
-	    seed=0, verbose=True)
+	    n, int(m), D, k=k, iters=iters, 
+	    thresh=float(t), verbose=True)
 	capacity[tidx, midx] = k-1
 	print "m=%d : capacity is %d (%d%% error tolerance)" % (m, k-1, t*100)
+
+# <codecell>
+
+import joblib
+joblib.Memory?
 
 # <codecell>
 
