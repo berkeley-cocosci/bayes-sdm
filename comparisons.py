@@ -75,9 +75,9 @@ for tidx, t in enumerate(thresh):
 	k = metrics.test_capacity(
 	    (int(n), int(m), float(D)), 
 	    k=int(k), iters=int(iters), 
-	    thresh=float(t), verbose=True)
+	    thresh=float(t), verbose=False)
 	sdm_capacity[tidx, midx] = k-1
-	print "m=%d : capacity is %d (%d%% error tolerance)" % (m, k-1, t*100)
+	#print "m=%d : capacity is %d (%d%% error tolerance)" % (m, k-1, t*100)
 
 # <codecell>
 
@@ -87,9 +87,9 @@ k = 1
 for tidx, t in enumerate(thresh):
     k = metrics.test_capacity(
 	int(n), k=int(k), iters=int(iters), 
-	thresh=float(t), verbose=True)
+	thresh=float(t), verbose=False)
     hop_capacity[tidx] = k-1
-    print "capacity is %d (%d%% error tolerance)" % (k-1, t*100)
+    #print "capacity is %d (%d%% error tolerance)" % (k-1, t*100)
 
 # <codecell>
 
@@ -116,7 +116,7 @@ for tidx, t in enumerate(thresh):
     plt.plot(M, 100*hop_capacity[tidx, None]*np.ones_like(M) / float(n), 
 	     label='Hopfield %.1f%% err. tol.' % (t*100),
 	     color=colors[tidx], linestyle='--')
-    plt.plot(M, 100 * capacity[tidx] / M.astype('f8'),
+    plt.plot(M, 100 * sdm_capacity[tidx] / M.astype('f8'),
 	     label='SDM %.1f%% err. tol.' % (t*100),
 	     color=colors[tidx], linestyle='-')
 plt.xlabel("M (# addresses)")
@@ -150,13 +150,6 @@ for m in M:
 # <headingcell level=1>
 
 # Sequence Retrieval
-
-# <codecell>
-
-
-# <headingcell level=1>
-
-# Address/Data Distinction
 
 # <codecell>
 
