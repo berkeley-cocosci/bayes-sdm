@@ -10,22 +10,15 @@ from util import corrupt, plot_io
 
 # <codecell>
 
-def like_matlab(arr):
-    n = int(np.sqrt(arr.shape[0]))
-    newarr = arr[:, 0].reshape((n, n), order='F').ravel()[:, None]
-    return newarr
-
-# <codecell>
-
 data = np.load('patterns.npz')
-X = like_matlab(data['X'])
-hi = like_matlab(data['hi'])
-face = like_matlab(data['face'])
+X = data['X']
+hi = data['hi']
+face = data['face']
+num1 = data['num1']
+num2 = data['num2']
+num3 = data['num3']
+num4 = data['num4']
 data.close()
-num1 = like_matlab(np.load('1.npy'))
-num2 = like_matlab(np.load('2.npy'))
-num3 = like_matlab(np.load('3.npy'))
-num4 = like_matlab(np.load('4.npy'))
 inputs = np.hstack([face, X, hi, num1, num2, num3, num4])
 
 # <codecell>
@@ -49,7 +42,7 @@ for i in xrange(7):
 c = 5 # amount of bits to corrupt
 n = 15 # number of exemplars
 
-exemplars = np.empty((100, n))
+exemplars = np.empty((100, n), dtype='i4')
 plt.figure(1)
 plt.clf()
 for i in xrange(n):
@@ -71,7 +64,7 @@ mem.writeM(addresses, exemplars)
 
 ex = corrupt(face, c)
 for i in xrange(1):
-    proto = mem.read(ex)
+    proto = mem.readM(ex)
     plt.figure()
     plot_io(ex.reshape((10, 10), order='F'), proto.reshape((10, 10), order='F'))
     ex = proto.copy()

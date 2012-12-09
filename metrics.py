@@ -87,13 +87,11 @@ def test_hopfield_noise_tolerance_n(n, k=1, noise=0, iters=100):
     for i in xrange(iters):
         # generate random inputs
         vecs = util.random_input(n, k)
-        cvecs = util.corrupt_k(vecs, bits)
-        v = (vecs * 2) - 1
-        cv = (cvecs * 2) - 1
+        cvecs = util.corrupt(vecs, bits)
         # create hopfield net
-        mem = hop.hopnet(v)
+        mem = hop.hopnet(vecs)
         # read the items backout
-        r = ((mem.readM(cv, 1000) + 1) / 2.0).astype('i4')
+        r = mem.readM(cvecs, 1000)
         # find the largest fraction of corrupted bits
         corruption[i] = np.mean(r ^ vecs, axis=0)
 
@@ -113,7 +111,7 @@ def test_sdm_noise_tolerance_n(params, k=1, noise=0, iters=100):
     for i in xrange(iters):
         # generate random inputs
         vecs = util.random_input(n, k)
-        cvecs = util.corrupt_k(vecs, bits)
+        cvecs = util.corrupt(vecs, bits)
         # reset the memory to its original state
         mem.reset()
         # write random inputs to memory
@@ -163,13 +161,12 @@ def test_hopfield_prototype_n(n, k=1, noise=0, iters=100):
     for i in xrange(iters):
         # generate random inputs
         vec = util.random_input(n, 0)
-        cvecs = util.corrupt_k(
+        cvecs = util.corrupt(
             vec[:, None]*np.ones((n, k+1)), bits)
-        cv = (cvecs * 2) - 1
         # create hopfield net
-        mem = hop.hopnet(cv[:, :-1])
+        mem = hop.hopnet(cvecs[:, :-1])
         # read the items backout
-        r = ((mem.read(1000, cv[:, -1]) + 1) / 2.0).astype('i4')
+        r = mem.read(cvecs[:, -1], 1000)
         # find the largest fraction of corrupted bits
         corruption[i] = np.mean(r ^ vec)
 
@@ -186,7 +183,7 @@ def test_sdm_prototype_n(params, k=1, noise=0, iters=100):
     for i in xrange(iters):
         # generate random prototype and exemplars
         vec = util.random_input(n, 0)
-        cvecs = util.corrupt_k(
+        cvecs = util.corrupt(
             vec[:, None]*np.ones((n, k+1), dtype='i4'), bits)
         # reset the memory to its original state
         mem.reset()

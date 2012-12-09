@@ -8,13 +8,17 @@ def corrupt(I, n):
     Ivanov (and then further modified by Jessica Hamrick).
     
     """
-    N = np.size(I)
+    cI = I.copy()
+    if I.ndim == 1:
+        cI = I.copy()[:, None]
+    N, k = cI.shape
     idx = np.arange(N)
-    np.random.shuffle(idx)
-    i = idx[:n][:, None]
-    Inew = I.copy()
-    Inew[i] *= -1
-    return Inew
+    for i in xrange(k):
+        cidx = np.random.choice(idx, size=n, replace=False)
+        cI[cidx, i] = 1 - cI[cidx, i]
+    if I.ndim == 1:
+        cI = cI[:, 0]
+    return cI
 
 def plot_io(input, output):
     kwargs = {
@@ -69,26 +73,10 @@ def random_input(n, k=0, rso=None):
 
     return out
 
-def corrupt_k(I, b):
-    """Corrupt inputs I by flipping exactly `b` bits for each input.
-
-    Parameters
-    ----------
-    I : array of shape (n, k)
-    b : integer <= n
-
-    """
-
-    n, k = I.shape
-    idx = range(n)
-    cI = I.copy()
-    for i in xrange(k):
-        cidx = np.random.choice(idx, size=b, replace=False)
-        cI[cidx, i] = 1-cI[cidx, i]
-    return cI
-
 def set_fig_properties():
     fig = plt.gcf()
     fig.clf()
     fig.set_figwidth(6)
     fig.set_figheight(4)
+
+

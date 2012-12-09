@@ -54,7 +54,8 @@ n = 100
 # hamming distance encompasses 2.5% of addresses
 D = float((n / 2.) - (np.sqrt(n*(0.5**2)) * 1.96))
 #M = np.arange(200, 1+2000, 200)
-M = np.array([200, 400, 800, 1600, 3200, 6400, 12800])
+#M = np.array([200, 400, 800, 1600, 3200, 6400, 12800])
+M = np.array([200, 400])
 
 # error thresholds
 thresh = 0.0
