@@ -136,7 +136,6 @@ plt.legend(loc=0)
 
 # How many random, uncorrelated inputs can the SDM store and be able
 # to retrieve even with corruption?
-M = np.arange(100, 1+1000, 100)
 sdm_tolerance = np.empty((noise.size, M.size))
 for nidx, err in enumerate(noise):
     k = 1
@@ -146,11 +145,12 @@ for nidx, err in enumerate(noise):
 	    k=int(k), noise=float(err),
 	    iters=int(iters), thresh=thresh, verbose=False) - 1
 	sdm_tolerance[nidx, midx] = k
-	print "m=%d : capacity is %d (%d%% corruption)" % (m, k, err*100)
+	print "SDM (m=%d) capacity is %d (%d%% corruption)" % (m, k, err*100)
 
 # <codecell>
 
-# How many random, uncorrelated inputs can the Hopfield net store?
+# How many random, uncorrelated inputs can the Hopfield net store and
+# be able to retrieve even with corruption?
 hop_tolerance = np.empty(noise.size)
 k = 1
 for nidx, err in enumerate(noise):
@@ -158,7 +158,7 @@ for nidx, err in enumerate(noise):
 	int(n), k=1, noise=float(err),
 	iters=int(iters), thresh=thresh, verbose=False) - 1
     hop_tolerance[nidx] = k
-    print "capacity is %d (%d%% error corruption)" % (k, err*100)
+    print "Hopfield capacity is %d (%d%% corruption)" % (k, err*100)
 
 # <codecell>
 
@@ -169,8 +169,8 @@ x = np.arange(data.shape[1])
 labels = np.hstack(["Hop.", M])
 
 for nidx, err in enumerate(noise):
-    f = (nidx+1.) / len(noise)
-    scolor = (f, f, f)
+    f = nidx / (len(noise)-1.)
+    scolor = (f, f, 1)
     hcolor = (1, f, f)
     plt.bar(x[:1], data[nidx, :1], align='center', color=hcolor)
     plt.bar(x[1:], data[nidx, 1:], align='center', color=scolor)
