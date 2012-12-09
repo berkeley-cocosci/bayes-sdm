@@ -46,7 +46,6 @@ def test_sdm_capacity_n(params, k=1, iters=100):
         
     return corruption
 
-#@memory.cache(ignore=['verbose'])
 def test_capacity(params, k=1, iters=100, thresh=0, verbose=False):
     if hasattr(params, '__iter__'):
         testfunc = test_sdm_capacity_n
@@ -74,8 +73,13 @@ def test_capacity(params, k=1, iters=100, thresh=0, verbose=False):
 
     return k
 
+######################################################################
+    
 @memory.cache
 def test_hopfield_noise_tolerance_n(n, k=1, noise=0, iters=100):
+    if noise == 0:
+        return test_hopfield_capacity_n(n, k=k, iters=iters)
+    
     corruption = np.empty((iters, k))
     bits = int(n * noise)
 
@@ -97,6 +101,9 @@ def test_hopfield_noise_tolerance_n(n, k=1, noise=0, iters=100):
 
 @memory.cache
 def test_sdm_noise_tolerance_n(params, k=1, noise=0, iters=100):
+    if noise == 0:
+        return test_sdm_capacity_n(params, k=k, iters=iters)
+    
     n, m, D = params
     mem = sdm.SDM(n, m, D)
     corruption = np.empty((iters, k))
@@ -118,7 +125,6 @@ def test_sdm_noise_tolerance_n(params, k=1, noise=0, iters=100):
         
     return corruption
 
-#@memory.cache(ignore=['verbose'])
 def test_noise_tolerance(params, k=1, noise=0, iters=100, thresh=0, verbose=False):
     if hasattr(params, '__iter__'):
         testfunc = test_sdm_noise_tolerance_n
@@ -145,5 +151,66 @@ def test_noise_tolerance(params, k=1, noise=0, iters=100, thresh=0, verbose=Fals
             break
 
     return k
-        
 
+######################################################################
+        
+@memory.cache
+def test_hopfield_prototype_n(n, k=1, noise=0, iters=100):
+    corruption = np.empty(iters)
+    bits = int(n * noise)
+
+    # store the same number of items multiple times
+    for i in xrange(iters):
+        # generate random inputs
+        vec = util.random_input(n, 0)
+        cvecs = util.corrupt_k(
+            vec[:, None]*np.ones((n, k+1)), bits)
+        cv = (cvecs * 2) - 1
+        # create hopfield net
+        mem = hop.hopnet(cv[:, :-1])
+        # read the items backout
+        r = ((mem.read(1000, cv[:, -1]) + 1) / 2.0).astype('i4')
+        # find the largest fraction of corrupted bits
+        corruption[i] = np.mean(r ^ vec)
+
+    return corruption
+
+@memory.cache
+def test_sdm_prototype_n(params, k=1, noise=0, iters=100):
+    n, m, D = params
+    mem = sdm.SDM(n, m, D)
+    corruption = np.empty(iters)
+    bits = int(n * noise)
+    
+    # store the same number of items multiple times
+    for i in xrange(iters):
+        # generate random prototype and exemplars
+        vec = util.random_input(n, 0)
+        cvecs = util.corrupt_k(
+            vec[:, None]*np.ones((n, k+1), dtype='i4'), bits)
+        # reset the memory to its original state
+        mem.reset()
+        # write random inputs to memory
+        mem.writeM(cvecs[:, :-1], cvecs[:, :-1])
+        # read the items back out
+        r = mem.read(cvecs[:, -1])
+        # find the fraction of corrupted bits
+        corruption[i] = np.mean(r ^ vec)
+
+    return corruption
+
+def test_prototype(params, k=1, noise=0, iters=100):
+    if hasattr(params, '__iter__'):
+        testfunc = test_sdm_prototype_n
+    else:
+        testfunc = test_hopfield_prototype_n
+    
+    # compute noise tolerance
+    corruption = testfunc(
+        params, k=k, noise=noise, iters=iters)
+        
+    # compute statistics about the distances
+    mean = np.mean(corruption)
+    sem = scipy.stats.sem(corruption)
+
+    return mean
