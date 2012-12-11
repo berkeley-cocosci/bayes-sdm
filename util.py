@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import random
 
 def corrupt(I, n):
     """Corrupts the pattern 'I' by flipping exactly `n` bits.
@@ -14,7 +15,8 @@ def corrupt(I, n):
     N, k = cI.shape
     idx = np.arange(N)
     for i in xrange(k):
-        cidx = np.random.choice(idx, size=n, replace=False)
+        # cidx = np.random.choice(idx, size=n, replace=False)
+        cidx = random.sample(idx,n)
         cI[cidx, i] = 1 - cI[cidx, i]
     if I.ndim == 1:
         cI = cI[:, 0]
