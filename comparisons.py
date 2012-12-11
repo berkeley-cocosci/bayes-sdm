@@ -54,8 +54,7 @@ n = 100
 # hamming distance encompasses 2.5% of addresses
 D = float((n / 2.) - (np.sqrt(n*(0.5**2)) * 1.96))
 #M = np.arange(200, 1+2000, 200)
-#M = np.array([200, 400, 800, 1600, 3200, 6400, 12800])
-M = np.array([200, 400])
+M = np.array([200, 400, 800, 1600, 3200, 6400, 12800])
 
 # error thresholds
 thresh = 0.0
@@ -189,10 +188,14 @@ plt.legend(loc=0)
 
 # <codecell>
 
+reload(metrics)
+
 # How well can the SDM/Hopfield net store prototypes?
 m = 10000
-prototype_noise = np.arange(.05, 0.55, 0.05)
-prototype_k = np.array([2, 5, 10, 25, 50])
+kp = 10
+iters = 100
+prototype_noise = np.arange(.05, 0.45, 0.05)
+prototype_k = np.array([5, 10, 20])
 sdm_prototype = np.empty(
 	(prototype_noise.size, prototype_k.size))
 hop_prototype = np.empty(
@@ -201,20 +204,20 @@ for nidx, err in enumerate(prototype_noise):
     for kidx, k in enumerate(prototype_k):
 	p = metrics.test_prototype(
 	    (int(n), int(m), float(D)), 
-	    k=int(k), noise=float(err),
-	    iters=int(iters))
+	    kp=kp, ke=int(k), noise=float(err),
+	    iters=int(iters), verbose=verbose)
 	sdm_prototype[nidx, kidx] = p
 	print "%2d ex.: SDM prototype corruption is %f (%d%% corruption)" % (k, p, err*100)
 	p = metrics.test_prototype(
-	    int(n), k=int(k), noise=float(err),
-	    iters=int(iters))
+	    int(n), kp=kp, ke=int(k), noise=float(err),
+	    iters=int(iters), verbose=verbose)
 	hop_prototype[nidx, kidx] = p
 	print "%2d ex.: Hopfield prototype corruption is %f (%d%% corruption)" % (k, p, err*100)
     print
 
 # <codecell>
 
-plt.clf()
+ plt.clf()
 
 plt.subplot(1, 3, 1)
 plt.imshow(
