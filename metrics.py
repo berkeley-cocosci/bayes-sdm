@@ -45,36 +45,28 @@ def test_sdm_capacity_n(params, k=1, iters=100):
         
     return corruption
 
-def test_capacity(params, k0=1, iters=100, thresh=0, verbose=False):
+def test_capacity(params, k0, iters=100, verbose=False):
     if hasattr(params, '__iter__'):
         testfunc = test_sdm_capacity_n
     else:
         testfunc = test_hopfield_capacity_n
 
-    data = []
-    k = k0
+    data = np.empty((len(k0), 2))
         
     # test storing different numbers of items
-    while True:
+    for kidx, k in enumerate(k0):
         # compute capacity
         corruption = testfunc(
-            params, k=k, iters=iters)
+            params, k=int(k), iters=iters)
         
         # compute statistics about the distances
         maxc = np.mean(corruption, axis=1)
         mean = np.mean(maxc)
         sem = scipy.stats.sem(maxc)
-        data.append((mean, sem))
+        data[kidx] = (mean, sem)
+        
         if verbose:
             print "%2d:  %.3f +/- %.3f" % (k, mean, sem)
-
-        k += k0
-
-        # stop once we start to hit corruption
-        if (mean-sem) > thresh:
-            break
-
-    data = np.array(data)
 
     return data
 
@@ -128,36 +120,28 @@ def test_sdm_noise_tolerance_n(params, k=1, noise=0, iters=100):
         
     return corruption
 
-def test_noise_tolerance(params, k0=1, noise=0, iters=100, thresh=0, verbose=False):
+def test_noise_tolerance(params, k0, noise=0, iters=100, verbose=False):
     if hasattr(params, '__iter__'):
         testfunc = test_sdm_noise_tolerance_n
     else:
         testfunc = test_hopfield_noise_tolerance_n
 
-    data = []
-    k = k0
+    data = np.empty((len(k0), 2))
         
     # test storing different numbers of items
-    while True:
+    for kidx, k in enumerate(k0):
         # compute noise tolerance
         corruption = testfunc(
-            params, k=k, noise=noise, iters=iters)
+            params, k=int(k), noise=noise, iters=iters)
         
         # compute statistics about the distances
         maxc = np.mean(corruption, axis=1)
         mean = np.mean(maxc)
         sem = scipy.stats.sem(maxc)
-        data.append((mean, sem))
+        data[kidx] = (mean, sem)
+        
         if verbose:
             print "%2d:  %.3f +/- %.3f" % (k, mean, sem)
-
-        k += k0
-
-        # stop once we start to hit corruption
-        if (mean-sem) > thresh:
-            break
-
-    data = np.array(data)
 
     return data
 
@@ -175,7 +159,7 @@ def test_hopfield_prototype_n(n, kp=1, ke=1, noise=0, iters=100):
         cvecs = vecs[..., None] * np.ones((n, kp, ke), dtype='i4')
         cvecs = util.corrupt(
             cvecs.reshape((n, kp*ke)),
-            bits)
+            bits, with_replacement=True)
         ex = util.corrupt(vecs, bits)
         # create hopfield net
         mem = hop.hopnet(cvecs)
@@ -200,7 +184,7 @@ def test_sdm_prototype_n(params, kp=1, ke=1, noise=0, iters=100):
         cvecs = vecs[..., None] * np.ones((n, kp, ke), dtype='i4')
         cvecs = util.corrupt(
             cvecs.reshape((n, kp*ke)),
-            bits)
+            bits, with_replacement=True)
         ex = util.corrupt(vecs, bits)
         # reset the memory to its original state
         mem.reset()

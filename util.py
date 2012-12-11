@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import random
 import os
 
-def corrupt(I, n):
+def corrupt(I, n, with_replacement=False):
     """Corrupts the pattern 'I' by flipping exactly `n` bits.
 
     Python version of Bruno Olshausen's `corrupt.m` pythonized by Paul
@@ -17,7 +17,10 @@ def corrupt(I, n):
     idx = np.arange(N)
     for i in xrange(k):
         # cidx = np.random.choice(idx, size=n, replace=False)
-        cidx = random.sample(idx,n)
+        if with_replacement:
+            cidx = np.random.randint(0, N, n)
+        else:
+            cidx = random.sample(idx, n)
         cI[cidx, i] = 1 - cI[cidx, i]
     if I.ndim == 1:
         cI = cI[:, 0]
@@ -79,8 +82,16 @@ def random_input(n, k=0, rso=None):
 def set_fig_properties():
     fig = plt.gcf()
     fig.clf()
-    fig.set_figwidth(6)
-    fig.set_figheight(4)
+    fig.set_figwidth(8)
+    fig.set_figheight(6)
+
+def plot_error(x, data, color, alpha, label, linestyle='-'):
+    mean = data[:, 0]
+    sem = data[:, 1]
+    loerr = mean - sem
+    hierr = mean + sem
+    plt.fill_between(x, loerr, hierr, color=color, alpha=alpha)
+    plt.plot(x, mean, label=label, color=color, linestyle=linestyle)
 
 
 
