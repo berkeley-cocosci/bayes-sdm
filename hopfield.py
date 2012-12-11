@@ -52,13 +52,14 @@ class hopnet(object):
             defined by the matrix `T`, starting with input `address`
         """
 
+        # copy the data
+        data = address.copy().astype('i4')
         # convert to -1/+1
-        data = ((address * 2) - 1).astype('i4')
-
+        mul = ((address * 2) - 1).astype('i4')
+        # udpate random indices
         idx = np.random.randint(self.numNeurons, size=iters)
-        #data[idx]= 2*(np.dot(self.T[idx,:],data)>0) -
-        data[idx]= np.dot(self.T[idx,:],data) > 0
-
+        # read data
+        data[idx] = np.dot(self.T[idx,:], mul) > 0
         return data
 
 
