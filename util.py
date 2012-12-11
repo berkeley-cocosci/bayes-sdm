@@ -94,7 +94,6 @@ def plot_error(x, data, color, alpha, label, linestyle='-'):
     plt.plot(x, mean, label=label, color=color, linestyle=linestyle)
 
 
-
 def save(path, ext='png', close=True, verbose=True):
     """Save a figure from pyplot.
 
@@ -146,4 +145,3 @@ def save(path, ext='png', close=True, verbose=True):
 
     if verbose:
         print("Done")
-

@@ -203,79 +203,70 @@ for nidx, err in enumerate(prototype_noise):
 
 # <codecell>
 
+vmin = 0.97
+vmax = 1
 plt.clf()
 
-plt.subplot(1, 3, 1)
-plt.imshow(
+gs = plt.GridSpec(1, 3, width_ratios=[10, 10, 1])
+
+plt.subplot(gs[0])
+im = plt.imshow(
     1-sdm_prototype, 
-    cmap='gray', interpolation='nearest', vmin=0.5, vmax=1)
+    cmap='gray', interpolation='nearest', 
+    vmin=vmin, vmax=vmax,
+    origin='lower')
 plt.xticks(np.arange(prototype_k.size), prototype_k)
 plt.yticks(np.arange(noise.size), noise)
 plt.title("SDM (M=%d)" % m)
 plt.xlabel("Exemplars")
-plt.ylabel("Percent Corruption")
+plt.ylabel("Exemplar Percent Corruption")
 
-plt.subplot(1, 3, 2)
+plt.subplot(gs[1])
 plt.imshow(
     1-hop_prototype, 
-    cmap='gray', interpolation='nearest', vmin=0.5, vmax=1)
+    cmap='gray', interpolation='nearest', 
+    vmin=vmin, vmax=vmax,
+    origin='lower')
 plt.xticks(np.arange(prototype_k.size), prototype_k)
 plt.yticks(np.arange(noise.size), [])
 plt.title("Hopfield")
 plt.xlabel("Exemplars")
 
-plt.subplot(1, 3, 3)
+sp = plt.subplot(gs[2])
+plt.colorbar(im, cax=sp)
+sp.set_ylabel("Prototype Accuracy")
+
+plt.suptitle("Prototype Retrieval from Stored Exemplars", fontsize=15)
+
+# <codecell>
+
 diff = hop_prototype-sdm_prototype
-plt.imshow(
-    np.sign(diff)*(2**np.log(np.abs(diff))), 
-    #diff,
-    cmap='RdBu', interpolation='nearest', vmin=-0.5, vmax=0.5)
+diff = np.sign(diff)*(1.5**np.log(np.abs(diff)))
+diffmax = np.max(np.abs(diff))
+plt.clf()
+
+gs = plt.GridSpec(1, 2, width_ratios=[20, 1])
+
+plt.subplot(gs[0])
+im = plt.imshow(
+    diff,
+    cmap='RdBu', interpolation='nearest', 
+    vmin=-diffmax, vmax=diffmax,
+    origin='lower')
 plt.xticks(np.arange(prototype_k.size), prototype_k)
 plt.yticks(np.arange(noise.size), [])
-plt.title("Hopfield-SDM")
 plt.xlabel("Exemplars")
 
+sp = plt.subplot(gs[1])
+cb = plt.colorbar(im, sp)
+cb.set_ticks([-diffmax, 0, diffmax])
+#sp.set_ticks([-diffmax, 0, diffmax])
+sp.set_yticklabels(['Hopfield better',
+		    'No difference', 
+		    'SDM better'])
 
-# <headingcell level=1>
-
-# Sequence Retrieval
-
-# <codecell>
-
-
-# <codecell>
-
-# # plot the storage capacity as a function of address space size
-# util.set_fig_properties()
-# data = np.hstack([hop_capacity, sdm_capacity])
-# x = np.arange(data.size)
-# labels = np.hstack(["Hop.", M.astype('str')])
-
-# plt.bar(x[:1], data[:1], align='center', color='r')
-# plt.bar(x[1:], data[1:], align='center', color='b')
-
-# plt.xticks(x, labels)
-# plt.xlim(-1, data.size)
-# plt.xlabel("M (# addresses)")
-# plt.ylabel("Capacity (# uncorrupted items)")
-# plt.title("SDM and Hopfield Capacities (N=%d)" % n)
-# plt.legend(loc=0)
+plt.suptitle("Difference between Hopfield and SDM prototype retrieval", fontsize=15)
 
 # <codecell>
 
-# # plot the utilization as a function of address space size
-# util.set_fig_properties()
-# data = np.hstack([100*hop_capacity/float(n), 100*sdm_capacity/M.astype('f8')])
-# x = np.arange(data.size)
-# labels = np.hstack(["Hop.", M.astype('str')])
-
-# plt.bar(x[:1], data[:1], align='center', color='r')
-# plt.bar(x[1:], data[1:], align='center', color='b')
-
-# plt.xticks(x, labels)
-# plt.xlim(-1, data.size)
-# plt.xlabel("M (# addresses)")
-# plt.ylabel("Percent Utilization")
-# plt.title("SDM and Hopfield Utilizations (N=%d)" % n)
-# plt.legend(loc=0)
 
