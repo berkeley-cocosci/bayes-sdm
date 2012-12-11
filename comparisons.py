@@ -49,19 +49,32 @@ import metrics as metrics
 # <codecell>
 
 # length of inputs
-n = 100
+n = 16**2
 
 # hamming distance encompasses 2.5% of addresses
 D = float((n / 2.) - (np.sqrt(n*(0.5**2)) * 1.96))
 #M = np.arange(200, 1+2000, 200)
-M = np.array([200, 400, 800, 1600, 3200, 6400, 12800])
+M = np.array([400, 800, 1600, 3200, 6400, 12800])
 
 # error thresholds
-thresh = 0.0
+thresh = 0.005
 # noise
 noise = np.array([0.0, 0.01, 0.02, 0.04, 0.08, 0.16])
 # number of simulations to run
-iters = 100
+iters = 20
+
+k0 = 10
+
+colors = ['#FF0000', # red 
+	  '#FF9933', # orange
+	  '#FFFF00', # yellow
+	  '#00FF00', # green
+	  '#00FFFF', # cyan
+	  '#0000FF', # blue
+	  '#660099', # violet
+	  # '#FF00FF', # magenta
+	  '#FF0099', # pink
+	  ]
 
 verbose = True
 
@@ -72,59 +85,51 @@ verbose = True
 # <codecell>
 
 # How many random, uncorrelated inputs can the SDM store?
-sdm_capacity = np.empty(M.size)
-k = 1
+sdm_capacity = []
 for midx, m in enumerate(M):
-    k = metrics.test_capacity(
+    print "SDM (M=%d)" % m
+    data = metrics.test_capacity(
 	(int(n), int(m), float(D)), 
-	k=int(k), iters=int(iters), 
-	thresh=thresh, verbose=verbose) - 1
-    sdm_capacity[midx] = k
-    print "SDM (m=%d) capacity is %d" % (m, k)
+	k0=k0, iters=int(iters), 
+	thresh=thresh, verbose=verbose)
+    sdm_capacity.append(data)
 
 # <codecell>
 
 # How many random, uncorrelated inputs can the Hopfield net store?
-k = metrics.test_capacity(
-    int(n), k=1, iters=int(iters), 
-    thresh=thresh, verbose=verbose) - 1
-hop_capacity = k
-print "Hopfield capacity is %d" % k
+print "Hopfield"
+hop_capacity = metrics.test_capacity(
+    int(n), k0=k0, iters=int(iters), 
+    thresh=thresh, verbose=verbose)
 
 # <codecell>
 
-# plot the storage capacity as a function of address space size
+# plot corruption as a function of items stored
 util.set_fig_properties()
-data = np.hstack([hop_capacity, sdm_capacity])
-x = np.arange(data.size)
-labels = np.hstack(["Hop.", M.astype('str')])
+fig = plt.gcf()
+fig.set_figwidth(8)
+fig.set_figheight(6)
+alpha = 0.3
 
-plt.bar(x[:1], data[:1], align='center', color='r')
-plt.bar(x[1:], data[1:], align='center', color='b')
+data = hop_capacity
+loerr = data[:,0]-data[:,1]
+hierr = data[:,0]+data[:,1]
+x = k0*np.arange(1, data.shape[0]+1)
+plt.fill_between(x, loerr, hierr, color=colors[0], alpha=alpha)
+plt.plot(x, data[:,0], label='Hopfield', color=colors[0])
 
-plt.xticks(x, labels)
-plt.xlim(-1, data.size)
-plt.xlabel("M (# addresses)")
-plt.ylabel("Capacity (# uncorrupted items)")
-plt.title("SDM and Hopfield Capacities (N=%d)" % n)
-plt.legend(loc=0)
+for i in xrange(M.size):
+    data = sdm_capacity[i]
+    loerr = data[:,0]-data[:,1]
+    hierr = data[:,0]+data[:,1]
+    x = k0*np.arange(1, data.shape[0]+1)
+    plt.fill_between(x, loerr, hierr, color=colors[i+1], alpha=alpha)
+    plt.plot(x, data[:,0], label='M=%d' % M[i], color=colors[i+1])
 
-# <codecell>
-
-# plot the utilization as a function of address space size
-util.set_fig_properties()
-data = np.hstack([100*hop_capacity/float(n), 100*sdm_capacity/M.astype('f8')])
-x = np.arange(data.size)
-labels = np.hstack(["Hop.", M.astype('str')])
-
-plt.bar(x[:1], data[:1], align='center', color='r')
-plt.bar(x[1:], data[1:], align='center', color='b')
-
-plt.xticks(x, labels)
-plt.xlim(-1, data.size)
-plt.xlabel("M (# addresses)")
-plt.ylabel("Percent Utilization")
-plt.title("SDM and Hopfield Utilizations (N=%d)" % n)
+plt.ylim(0, thresh)
+plt.xlabel("Number of stored items")
+plt.ylabel("Mean fraction of corrupted bits")
+plt.title("SDM and Hopfield Capacities for Ideal Inputs (N=%d)" % n)
 plt.legend(loc=0)
 
 # <headingcell level=1>
@@ -135,50 +140,50 @@ plt.legend(loc=0)
 
 # How many random, uncorrelated inputs can the SDM store and be able
 # to retrieve even with corruption?
-sdm_tolerance = np.empty((noise.size, M.size))
+m = 12800
+sdm_tolerance = []
+hop_tolerance = []
 for nidx, err in enumerate(noise):
-    k = 1
-    for midx, m in enumerate(M):
-	k = metrics.test_noise_tolerance(
-	    (int(n), int(m), float(D)), 
-	    k=int(k), noise=float(err),
-	    iters=int(iters), thresh=thresh, verbose=verbose) - 1
-	sdm_tolerance[nidx, midx] = k
-	print "SDM (m=%d) capacity is %d (%d%% corruption)" % (m, k, err*100)
-
-# <codecell>
-
-# How many random, uncorrelated inputs can the Hopfield net store and
-# be able to retrieve even with corruption?
-hop_tolerance = np.empty(noise.size)
-k = 1
-for nidx, err in enumerate(noise):
-    k = metrics.test_noise_tolerance(
-	int(n), k=1, noise=float(err),
-	iters=int(iters), thresh=thresh, verbose=verbose) - 1
-    hop_tolerance[nidx] = k
-    print "Hopfield capacity is %d (%d%% corruption)" % (k, err*100)
+    print "SDM (M=%d) w/ %f%% corruption" % (m, err*100)
+    sdm_tolerance.append(metrics.test_noise_tolerance(
+	(int(n), int(m), float(D)), 
+	k0=k0, noise=float(err),
+	iters=int(iters), thresh=thresh, verbose=verbose))
+    print "Hopfield w/ %f%% corruption" % (err*100)
+    hop_tolerance.append(metrics.test_noise_tolerance(
+	int(n), k0=k0, noise=float(err),
+	iters=int(iters), thresh=thresh, verbose=verbose))
 
 # <codecell>
 
 # plot the storage capacity as a function of address space size
 util.set_fig_properties()
-data = np.hstack([hop_tolerance[:, None], sdm_tolerance])
-x = np.arange(data.shape[1])
-labels = np.hstack(["Hop.", M])
+fig = plt.gcf()
+fig.set_figwidth(10)
+fig.set_figheight(8)
 
 for nidx, err in enumerate(noise):
-    f = nidx / (len(noise)-1.)
-    scolor = (f, f, 1)
-    hcolor = (1, f, f)
-    plt.bar(x[:1], data[nidx, :1], align='center', color=hcolor)
-    plt.bar(x[1:], data[nidx, 1:], align='center', color=scolor)
+    data = hop_tolerance[nidx]
+    x = k0*np.arange(1, data.shape[0]+1)
+    loerr = data[:, 0] - data[:, 1]
+    hierr = data[:, 0] + data[:, 1]
+    plt.fill_between(x, loerr, hierr, color=colors[nidx], alpha=alpha)
+    plt.plot(x, data[:, 0], color=colors[nidx], linestyle='--', 
+	     label="Hop %d%% corruption" % (err*100))
 
-plt.xticks(x, labels)
-plt.xlim(-1, x.size)
-plt.xlabel("M (# addresses)")
-plt.ylabel("Capacity (# uncorrupted items)")
-plt.title("SDM and Hopfield Error Tolerance (N=%d)" % n)
+    data = sdm_tolerance[nidx]
+    x = k0*np.arange(1, data.shape[0]+1)
+    loerr = data[:, 0] - data[:, 1]
+    hierr = data[:, 0] + data[:, 1]
+    plt.fill_between(x, loerr, hierr, color=colors[nidx], alpha=alpha)
+    plt.plot(x, data[:, 0], color=colors[nidx], linestyle='-', 
+	     label="SDM %d%% corruption" % (err*100))
+
+plt.xlim(5, 135)
+plt.ylim(0, thresh)
+plt.xlabel("Number of stored items")
+plt.ylabel("Fraction of corrupted bits")
+plt.title("SDM (M=%d) and Hopfield Error Tolerance (N=%d)" % (m, n))
 plt.legend(loc=0)
 
 
@@ -255,4 +260,40 @@ plt.xlabel("Exemplars")
 
 # <codecell>
 
+
+# <codecell>
+
+# # plot the storage capacity as a function of address space size
+# util.set_fig_properties()
+# data = np.hstack([hop_capacity, sdm_capacity])
+# x = np.arange(data.size)
+# labels = np.hstack(["Hop.", M.astype('str')])
+
+# plt.bar(x[:1], data[:1], align='center', color='r')
+# plt.bar(x[1:], data[1:], align='center', color='b')
+
+# plt.xticks(x, labels)
+# plt.xlim(-1, data.size)
+# plt.xlabel("M (# addresses)")
+# plt.ylabel("Capacity (# uncorrupted items)")
+# plt.title("SDM and Hopfield Capacities (N=%d)" % n)
+# plt.legend(loc=0)
+
+# <codecell>
+
+# # plot the utilization as a function of address space size
+# util.set_fig_properties()
+# data = np.hstack([100*hop_capacity/float(n), 100*sdm_capacity/M.astype('f8')])
+# x = np.arange(data.size)
+# labels = np.hstack(["Hop.", M.astype('str')])
+
+# plt.bar(x[:1], data[:1], align='center', color='r')
+# plt.bar(x[1:], data[1:], align='center', color='b')
+
+# plt.xticks(x, labels)
+# plt.xlim(-1, data.size)
+# plt.xlabel("M (# addresses)")
+# plt.ylabel("Percent Utilization")
+# plt.title("SDM and Hopfield Utilizations (N=%d)" % n)
+# plt.legend(loc=0)
 
