@@ -86,20 +86,7 @@ We explore the storage of exemplars in associative memory systems as an initial 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction}
 
-% something broad about prob models of cognition 
-\cite{griffiths2010probabilistic,tenenbaum2011grow}
-
-% something about issues with prob models
-\cite{kahneman1972subjective,gigerenzer2000simple}
-
-% something about marrs levels and that approach
-\cite{marr82,anderson90}
-
-% something about addressing these issues with RPM and bridging levels
-\cite{sanborn2010rational,griffiths2012bridging}
-
-% in particular we look at exemplar model approx
-\cite{Shi2010}
+How do people make complicated inferences like separating concepts into categories, learning languages, or discovering causal relationships between events, constrained by limited evidence? Probabilistic models of cognition offer one such account of how people do this, with a rapidly growing body of literature supporting their claims \cite{griffiths2010probabilistic,tenenbaum2011grow}. These models provide a \textit{rational analysis} of human inductive inference, answering questions of cognition regarding \textit{why} people behave as they do \cite{marr82,anderson90}. However, traditional models from cognitive psychology focus on answering questions as to \textit{how} cognitive processes support these behaviors \cite{kahneman1972subjective,medin1978context,gigerenzer2000simple}. It remains unclear what psychological mechanisms could be responsible for carrying out the probabilistic computations in rational models. In order to bridge these methods of analyzing cognition, recent work has shown promise in using psychological process models as methods of approximating probabilistic inference \cite{sanborn2010rational,griffiths2012bridging}. As motivation for our research, we focus on a particular investigation under this approach, where an exemplar model of memory was shown to be equivalent to a well known Monte Carlo method known as Importance Sampling \cite{Shi2010}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % subsection - exemplar models / IS for Bayes 
@@ -234,22 +221,6 @@ More formally, given a set of binary patterns $\bf{p}^{\alpha}$ of length $N$ in
 % model evaluation
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Exemplar storage in associative memory systems}
-
-\begin{figure}[t!]
-  \begin{center}
-    \begin{tabular}{lclclc}
-      \raisebox{2.0in}{(a)} &
-      \includegraphics[width=0.24\textwidth]{./figures/hopfieldNetwork.png} &
-      \raisebox{2.0in}{(b)} &
-      \includegraphics[width=0.27\textwidth]{./figures/sdmNetwork.png} &
-      \raisebox{2.0in}{(c)} &
-      \includegraphics[width=0.29\textwidth]{./figures/sdmOperations.png}
-    \end{tabular}
-    \caption{Neural network implementations of a Hopfield network
-      (panel a) and an SDM (panel b).}
-    \label{neuralNets}
-  \end{center}
-\end{figure}
 
 We compared the Hopfield and SDM models using several different
 metrics to gauge their fitness as exemplar storage systems.
@@ -387,6 +358,11 @@ SDM; however, with more exemplars, the SDM quickly recovers.
     \label{sequences}
   \end{center}
 \end{figure}
+
+Hopfield networks typically function only as autoassociative memory systems, whereas SDMs can associate one pattern with another, acting as a heteroassociative memory. In this section, we simply demonstrate this capability in an SDM by storing and retrieving temporal sequences of patterns.
+
+SDM storage consists of writing and reading binary patterns $\bf{w}^{\alpha}$ at addresses given by $\bf{x}^{\alpha}$. When both pattern and address space consist of the same length of bits, $N$, there are no restrictions prohibiting $\bf{w}^{\alpha}$ to be an address pointing elsewhere in memory. Thus, if one sets $\bf{w}^{\alpha} = \bf{x}^{\alpha+1}$, we can store data as a linked list and retrieve it sequentially.
+
 
 
 
