@@ -198,14 +198,14 @@ An SDM can function as an \textit{autoassociative}, \textit{content-addressable}
 A simple way to understand how SDMs work follows from an analogue to conventional computer memory.
 
 
-\begin{figure}[ht!]
-\begin{center}
-\includegraphics[width=0.5\textwidth]{./figures/sdmOperations.png}
+% \begin{figure}[t!]
+% \begin{center}
+% \includegraphics[width=0.5\textwidth]{./figures/sdmOperations.png}
 
-\end{center}
-\caption{An illustration of the basic read/write operations over SDMs. The outer dotted line represents the space of $2^{N}$ possible addresses while the squares with labels $A_{m}$ represent the $M$ sampled hard addresses used for storage. The address being requested for operation is the $X$ in the center of the blue circle of radius $H$. The hard addresses selected for operating correspond to the blue squares within the Hamming radius of $X$.} 
-\label{sdmBasics}
-\end{figure}
+% \end{center}
+% \caption{An illustration of the basic read/write operations over SDMs. The outer dotted line represents the space of $2^{N}$ possible addresses while the squares with labels $A_{m}$ represent the $M$ sampled hard addresses used for storage. The address being requested for operation is the $X$ in the center of the blue circle of radius $H$. The hard addresses selected for operating correspond to the blue squares within the Hamming radius of $X$.} 
+% \label{sdmBasics}
+% \end{figure}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -217,11 +217,13 @@ A simple way to understand how SDMs work follows from an analogue to conventiona
 \begin{figure*}[tb]
 {
 	\hfill{}
-	\begin{tabular}{lclc}
+	\begin{tabular}{lclclc}
 	\raisebox{2.0in}{(a)} &
-		\includegraphics[width=0.3\textwidth]{./figures/hopfieldNetwork.png} &
+		\includegraphics[width=0.24\textwidth]{./figures/hopfieldNetwork.png} &
 	\raisebox{2.0in}{(b)} &
-		\includegraphics[width=0.35\textwidth]{./figures/sdmNetwork.png} 
+		\includegraphics[width=0.27\textwidth]{./figures/sdmNetwork.png} 
+	\raisebox{2.0in}{(c)} &
+		\includegraphics[width=0.29\textwidth]{./figures/sdmOperations.png} &
 	\end{tabular}
 }
 \hfill{}
@@ -246,12 +248,11 @@ A simple way to understand how SDMs work follows from an analogue to conventiona
 \begin{figure*}[ht!]
 {
 	\hfill{}
-	\begin{tabular}{ l c }
+	\begin{tabular}{lclc}
 	\raisebox{3.75in}{(a)} &
-		\includegraphics[width=0.8\textwidth]{./figures/capacity-edit.png} \vspace{20bp}
-		\\
+		\includegraphics[width=0.4\textwidth]{./figures/capacity-edit.png}
 	\raisebox{3.2in}{(b)} &
-		\includegraphics[width=0.8\textwidth]{./figures/tolerance-edit.png} 
+		\includegraphics[width=0.4\textwidth]{./figures/tolerance-edit.png} 
 	\end{tabular}
 }
 \hfill{}
@@ -347,10 +348,77 @@ A simple way to understand how SDMs work follows from an analogue to conventiona
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Probabilistic interpretations of SDMs}
 
-*** probabilistic interpretations \cite{Anderson1989}\\
-*** figure out the encoding for importance sampling \\
-*** how close does it have to be to the delta function? \\
+% *** probabilistic interpretations \cite{Anderson1989}\\
+% *** figure out the encoding for importance sampling \\
+% *** how close does it have to be to the delta function? \\
 
+\subsection{Writing}
+
+We have a set of exemplars, $(x^*, y)$, which we wish to store in
+SDM. However, due to the sparsity of the SDM, we only have access to a
+set of addresses $A\subseteq X^*$, where $X^*$ is the full address
+space of size $2^N$. Thus, we wish to write $(a_j, y)\forall a_j\in A$
+such that $\mathbb{E}_A[a_j, y|x^*]=(x^*,y)$.
+
+Let us define the probability of writing to address $a_j$ given an
+input address $x_i^*$ as $w(a_j,x_i^*)$. In the limit, the number of
+addresses increases to the point where we will always be able to write
+to exactly $x_i^*$. Thus, this writing density must satisfy the
+following constraint:
+\begin{equation}
+\lim_{M\rightarrow 2^N}w(a_j,x_i^*) = \delta(a_j=w_i^*)
+\label{eq:w}
+\end{equation}
+
+After writing multiple values $(x_i^*, y)$, the value of the counter
+associated with address $a_j$ will be:
+\begin{equation}
+C_j=\sum_i w(a_j,x_i^*)y_i
+\label{eq:Cj}
+\end{equation}
+
+\subsection{Reading}
+
+We are given an address $x^*$ from which we want to read. Again,
+however, we only have access to addresses $A\subseteq X^*$, where
+$X^*$ is the full address space. Thus, we want to read from addresses
+$(a_j, y)\forall a_j\in A$ such that 
+$\mathbb{E}_A[a_j,y|x^*]=(x^*,y)$.
+
+Let us define the probability of reading from address $x$ given an
+input address $a_j$ as:
+\begin{equation}
+r(x, a_j)\propto \Pr(x|x^*=a_j)
+\label{eq:r}
+\end{equation}
+
+Then, the read function is given by:
+\begin{equation}
+R(x)=\sum_j C_j r(x, a_j)
+\label{eq:R}
+\end{equation}
+
+Substituting Eq. \ref{eq:Cj} into Eq. \ref{eq:R}, we obtain:
+\begin{equation}
+R(x) = \sum_j\left[\sum_i w(a_j, x_i^*)y_i\right]r(x,a_j)
+\end{equation}
+
+Now, we can compute the expected value given by reading from address
+$x$:
+\begin{equation}
+\mathbb{E}_a[R(x)]=\sum_i\ y_i\cdot E_a\left[\sum_j w(a_j, x_i^*)r(x,a_j)\right]
+\end{equation}
+
+As our address space grows larger (as in Eq. \ref{eq:w}), this approaches:
+\begin{align}
+\lim_{M\rightarrow 2^N} \mathbb{E}_z[R(x)]&=\sum_i\ y_i \int_a \delta(a-x_i^*)\Pr(x|x^*=a)\ \mathrm{d}a\\
+&= \sum_i\ y_i\Pr(x|x_i*)
+\end{align}
+
+Thus, in the limit, the expected value that we read out will be:
+\begin{equation}
+\mathbb{E}[y|x]\propto \sum_i\ y_i\Pr(x|x_i^*)
+\end{equation}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
