@@ -159,7 +159,7 @@ Hopfield networks are an autoassociative model of memory, where a set of binary 
 
 While the Hopfield network has received popularity for its simplicity as a neural model of memory, a number of limitations have been posited in the literature \cite{Keeler1988}: (1) The storage capacity of a Hopfield network is bounded by a small fraction of the number of processing units - i.e., the length of the input; (2) they cannot handle temporal sequences of patterns; (3) the requirement of symmetric weights in $\bf{T}$ make Hopfield networks  implausible as a model of the brain; and (4) Hopfield networks have limited abilities to store correlated patterns. We explore a number of these concerns in Section 3, our analysis of exemplar storage in Hopfield networks and SDMs.
 
-\begin{figure}[h!]
+\begin{figure}[t!]
   \begin{center}
     \begin{tabular}{lclclc}
       \raisebox{1.6in}{(a)} &
@@ -191,6 +191,24 @@ While the Hopfield network has received popularity for its simplicity as a neura
 \end{figure}
 
 
+\begin{figure}[t!]
+  \begin{center}
+    \includegraphics[width=0.9\textwidth]{./figures/all-capacities.png}
+    \caption{SDM and Hopfield network capacities. The left plot (a)
+      shows the storage capacities of uncorrupted inputs for the
+      Hopfield network (dashed line) and SDMs with different address
+      space sizes (solid lines). With small address spaces, the SDM
+      quickly suffers with relatively high corruption. However, with
+      sufficiently large address spaces, the SDM is much more accurate
+      than the Hopfield network, being able to store 200 items with
+      barely $1\%$ corruption. The right plot (b) shows storage
+      capacity when items are read using a corrupted input for
+      different levels of corruption.}
+    \label{fig:capacity}
+  \end{center}
+\end{figure}
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % subsection - SDM
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -214,9 +232,6 @@ More formally, given a set of binary patterns $\bf{p}^{\alpha}$ of length $N$ in
 \end{align}
 \noindent where $g(x_{i}) = 1$ if $x_{i} > 0$ and $0$ if $x_{i} \leq 0$.  
 
-
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % model evaluation
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -229,6 +244,22 @@ metrics to gauge their fitness as exemplar storage systems.
 % subsection - capacity
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Storage Capacity}
+
+\begin{figure}[t!]
+  \begin{center}
+    \begin{tabular}{ l l l c}
+      \raisebox{2.5in}{(a)} &
+      \includegraphics[width=0.43\textwidth]{./figures/exemplars.png} &
+      \raisebox{2.5in}{(b)} &
+      \includegraphics[width=0.4\textwidth]{./figures/prototypeResults.png} \\
+      %	\includegraphics[width=0.4\textwidth]{./figures/vi_sdm.png} 
+    \end{tabular}
+    \caption{(a) Nine noisy exemplars stored in both SDM and Hopfield
+      models. (b) The retrieval results for the Hopfield network (top)
+      and SDM network (bottom) when queried with a noisy word.}
+    \label{fig:prototypes}
+  \end{center}
+\end{figure}
 
 First, we explored the upper bound of storage capacity of the SDM
 versus the Hopfield network by generating $k$ random, uncorrelated
@@ -252,22 +283,6 @@ Hopfield net.
 
 Interestingly, at higher levels of noise, the SDM is significantly
 more error-prone than the Hopfield network. We suspect this is due to
-
-
-\begin{figure}[t!]
-  \begin{center}
-    % \begin{tabular}{lclc}
-    %   \raisebox{1.75in}{(a)} &
-    %   \includegraphics[width=0.4\textwidth]{./figures/capacity-edit.png}
-    %   \raisebox{1.75in}{(b)} &
-    %   \includegraphics[width=0.4\textwidth]{./figures/tolerance-edit.png} 
-    % \end{tabular}
-    \includegraphics[width=0.9\textwidth]{./figures/all-capacities.png}
-    \caption{SDM and Hopfield network capacities (panel a) and error
-      tolerances (panel b).}
-    \label{fig:capacity}
-  \end{center}
-\end{figure}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -311,28 +326,19 @@ Fig. \ref{fig:prototypes}). At high levels of corruption and low
 numbers of exemplars, the Hopfield network actually outperforms the
 SDM; however, with more exemplars, the SDM quickly recovers.
 
-\begin{figure}[t!]
-  \begin{center}
-    \begin{tabular}{ l l l c}
-      \raisebox{2.5in}{(a)} &
-      \includegraphics[width=0.43\textwidth]{./figures/exemplars.png} &
-      \raisebox{2.5in}{(b)} &
-      \includegraphics[width=0.4\textwidth]{./figures/prototypeResults.png} \\
-      %	\includegraphics[width=0.4\textwidth]{./figures/vi_sdm.png} 
-    \end{tabular}
-    \caption{(a) Nine noisy exemplars stored in both SDM and Hopfield
-      models. (b) The retrieval results for the Hopfield network (top)
-      and SDM network (bottom) when queried with a noisy word.}
-    \label{fig:prototypes}
-  \end{center}
-\end{figure}
-
 
 \begin{figure}[t!]
   \begin{center}
     \includegraphics[width=0.95\textwidth]{./figures/prototype-edit.png}
   \end{center}
-  \caption{This is a figure.} 
+  \caption{Prototype reconstruction accuracy for the SDM and Hopfield
+    network. The left two plots show the accuracy in reconstructing
+    three uncorrelated prototypes from different numbers of exemplars
+    with different levels of corruption. The right plot shows the
+    difference between SDM and Hopfield performance, with white
+    indicating no difference, blue indicating better performance by
+    the SDM, and red indicating better performance by the Hopfield
+    network. In most cases, the SDM outperforms the Hopfield network.}
   \label{fig:prototype-comparison}
 \end{figure}
 
