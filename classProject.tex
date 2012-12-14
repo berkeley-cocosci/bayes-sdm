@@ -352,66 +352,89 @@ A simple way to understand how SDMs work follows from an analogue to conventiona
 % *** figure out the encoding for importance sampling \\
 % *** how close does it have to be to the delta function? \\
 
+Exemplar models have more potential than uniformly storing data and
+recovering its mean. \citeA{Shi2010} demonstrated that exemplar models
+can be used to implement \textit{importance sampling}, a Monte Carlo
+method of approximating Bayesian inference.  Can SDMs be used to
+implement importance sampling? Previous work has formalized a
+probabilistic interpretation of SDMs \cite{Anderson1989}, thus
+suggesting that it should be possible to adjust that formalization to
+specifically encompass exemplar-based approximate inference. Here, we
+extend the idea of using exemplar models for importance sampling in
+the context of SDMs.
+
+\subsection{Overview}
+
+In general, our goal is to use SDMs to recover the expectation of some
+function $f(x^*)$. However, we cannot directly observe $x^*$; instead,
+we have observations $x$. Importance sampling provides a way for us to
+infer the value of $x^*$ given our observations, and therefore compute
+$y$. This is given by Eq. 12 in \citeA{Shi2010}:
+\begin{equation}
+E[f(x^*)|x]\approx \frac{\sum_j f(x_j^*)\Pr(x|x_j^*)}{\sum_j \Pr(x|x_j^*)}
+\end{equation}
+
+To translate this into the context of a SDM, let $x^*$ be the
+uncorrupted target address at which we want to read or write a value
+$y$. If $x$ is a corrupted version of $x^*$, then we wish to choose
+some addresses $a_j$ given $x$ such that reading and writing to those
+addresses approximate reading and writing $(x^*,y)$. This is
+equivalent to computing the expectation of $f(x^*)=y$ over the
+addresses $a_j$.
+
 \subsection{Writing}
 
-We have a set of exemplars, $(x^*, y)$, which we wish to store in
-SDM. However, due to the sparsity of the SDM, we only have access to a
-set of addresses $A\subseteq X^*$, where $X^*$ is the full address
-space of size $2^N$. Thus, we wish to write $(a_j, y)\forall a_j\in A$
-such that $\mathbb{E}_A[a_j, y|x^*]=(x^*,y)$.
-
 Let us define the probability of writing to address $a_j$ given an
-input address $x_i^*$ as $w(a_j,x_i^*)$. In the limit, the number of
+input address $x_i^*$ as $w(a_j|x_i^*)$. In the limit, the number of
 addresses increases to the point where we will always be able to write
 to exactly $x_i^*$. Thus, this writing density must satisfy the
 following constraint:
 \begin{equation}
-\lim_{M\rightarrow 2^N}w(a_j,x_i^*) = \delta(a_j=w_i^*)
+\lim_{M\rightarrow 2^N}w(a_j|x_i^*) = \delta(a_j=x_i^*)
 \label{eq:w}
 \end{equation}
 
 After writing multiple values $(x_i^*, y)$, the value of the counter
 associated with address $a_j$ will be:
 \begin{equation}
-C_j=\sum_i w(a_j,x_i^*)y_i
+C_j=\sum_i w(a_j|x_i^*)y_i
 \label{eq:Cj}
 \end{equation}
 
 \subsection{Reading}
 
-We are given an address $x^*$ from which we want to read. Again,
-however, we only have access to addresses $A\subseteq X^*$, where
-$X^*$ is the full address space. Thus, we want to read from addresses
-$(a_j, y)\forall a_j\in A$ such that 
-$\mathbb{E}_A[a_j,y|x^*]=(x^*,y)$.
-
-Let us define the probability of reading from address $x$ given an
-input address $a_j$ as:
+We are given an address $x$, which as before is a corrupted version of
+$x^*$; the goal is to read the value stored at $x^*$. We can define
+reading distribution as the likelihood that $x$ was generated from
+some $a_j$:
 \begin{equation}
-r(x, a_j)\propto \Pr(x|x^*=a_j)
+r(x| a_j)\propto \Pr(x|x^*=a_j)
 \label{eq:r}
 \end{equation}
 
-Then, the read function is given by:
+We weight the counter value $C_j$ for each $a_j$ based on the
+likelihood that $a_j$ is the actual target address. The sum over these
+values is:
 \begin{equation}
-R(x)=\sum_j C_j r(x, a_j)
+f(x)=\sum_j C_j r(x| a_j)
 \label{eq:R}
 \end{equation}
 
-Substituting Eq. \ref{eq:Cj} into Eq. \ref{eq:R}, we obtain:
-\begin{equation}
-R(x) = \sum_j\left[\sum_i w(a_j, x_i^*)y_i\right]r(x,a_j)
-\end{equation}
+% \begin{equation}
+% R(x) = 
+% \end{equation}
 
-Now, we can compute the expected value given by reading from address
-$x$:
-\begin{equation}
-\mathbb{E}_a[R(x)]=\sum_i\ y_i\cdot E_a\left[\sum_j w(a_j, x_i^*)r(x,a_j)\right]
-\end{equation}
+The expected value of this sum over all addresses $a$ is obtained by
+substituting Eq. \ref{eq:Cj} into Eq. \ref{eq:R} and simplifying due
+to linearity of expectation:
+\begin{align}
+\mathbb{E}_a[f(x)]&=\mathbb{E}_a\left[\sum_j\left(\sum_i w(a_j| x_i^*)y_i\right)r(x|a_j)\right]\\
+&=\sum_i\ y_i\cdot E_a\left(\sum_j w(a_j| x_i^*)r(x|a_j)\right)
+\end{align}
 
 As our address space grows larger (as in Eq. \ref{eq:w}), this approaches:
 \begin{align}
-\lim_{M\rightarrow 2^N} \mathbb{E}_z[R(x)]&=\sum_i\ y_i \int_a \delta(a-x_i^*)\Pr(x|x^*=a)\ \mathrm{d}a\\
+\lim_{M\rightarrow 2^N} \mathbb{E}_a[f(x)]&=\sum_i\ y_i \int_a \delta(a-x_i^*)\Pr(x|x^*=a)\ \mathrm{d}a\\
 &= \sum_i\ y_i\Pr(x|x_i*)
 \end{align}
 
@@ -419,6 +442,10 @@ Thus, in the limit, the expected value that we read out will be:
 \begin{equation}
 \mathbb{E}[y|x]\propto \sum_i\ y_i\Pr(x|x_i^*)
 \end{equation}
+
+\subsection{Empirical comparison}
+
+To verify this formulation of the SDM as an importance sampler, we 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
