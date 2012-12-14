@@ -219,7 +219,21 @@ More formally, given a set of binary patterns $\bf{p}^{\alpha}$ of length $N$ in
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Exemplar storage in associative memory systems}
 
-
+\begin{figure}[tb]
+  \begin{center}
+    \begin{tabular}{lclclc}
+      \raisebox{2.0in}{(a)} &
+      \includegraphics[width=0.24\textwidth]{./figures/hopfieldNetwork.png} &
+      \raisebox{2.0in}{(b)} &
+      \includegraphics[width=0.27\textwidth]{./figures/sdmNetwork.png} &
+      \raisebox{2.0in}{(c)} &
+      \includegraphics[width=0.29\textwidth]{./figures/sdmOperations.png} &
+    \end{tabular}
+    \caption{Neural network implementations of a Hopfield network
+      (panel a) and an SDM (panel b).}
+    \label{neuralNets}
+  \end{center}
+\end{figure}
 
 We compared the Hopfield and SDM models using several different
 metrics to gauge their fitness as exemplar storage systems.
@@ -276,8 +290,41 @@ more error-prone than the Hopfield network. We suspect this is due to
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Prototype Retrieval}
 
-% what happens when we try to store the noisy circles in an hopnet, does it converge to a prototype as well?
+One feature of associative memory systems is the ``averaging'' effect:
+as more vectors are stored in the memory, vectors that are close to
+each other may overlap in memory and reading will result in a vector
+that is somewhere in between. Importantly, this is related to a
+property of being able to retrieve a ``prototype'' vector from
+multiple stored ``exemplars''.
 
+Fig. \ref{fig:prototypes}a shows nine exemplars of the ``VI'' roman
+numeral, each with 25 corrupted bits ($\approx10\%$) , which were
+stored in the SDM and Hopfield network. Fig. \ref{fig:prototypes}b
+shows the result of querying each network with another corrupted
+exemplar: both return vectors that approach the true prototype and
+have much less corruption than any of the exemplars. In this
+particular example, the SDM is perfectly able to retrieve the
+prototype.
+
+To more rigorously test the abilities of the Hopfield network and SDM
+to retrieve prototypes, we performed the following steps 100 times:
+first, we generated three uncorrelated prototypes. For each prototype,
+we generated several corrupted exemplars, where the hamming distance
+between each exemplar and the prototype was no more than a specified
+amount of corruption. We stored these exemplars in the Hopfield
+network and SDM ($M=10000$) and then attempted to retrieve the
+prototype by querying with a new corrupted exemplar. We computed the
+amount of corruption in the prototype, and averaged across the 100
+trials. 
+
+Fig. \ref{fig:prototype-comparison} shows the results for different
+numbers of exemplars and different levels of corruption. Both the SDM
+and Hopfield network are able to retrieve near-perfect prototypes for
+corruption of no more than $5\%$ (in the case of the SDM, it is
+accurate even at $10\%$, consistent with the example in
+Fig. \ref{fig:prototypes}). At high levels of corruption and low
+numbers of exemplars, the Hopfield network actually outperforms the
+SDM; with more exemplars, the SDM quickly recovers, however. 
 
 \begin{center}
 \begin{figure*}[t!]
@@ -293,20 +340,17 @@ more error-prone than the Hopfield network. We suspect this is due to
 }
 \hfill{}
 \caption{(a) Nine noisy exemplars stored in both SDM and Hopfield models. (b) The retrieval results for the Hopfield network (top) and SDM network (bottom) when queried with a noisy word.}
-\label{prototypes}
+\label{fig:prototypes}
 \end{figure*}
 \end{center}
 
 
-% - even if it does, it can't really store much else without really messing things up due to its capacity, where in SDM it's just a tiny fraction of the space of things - ie, does storing noisy faces, numbers, circles, AND sequences do anything to the retrieval of the prototype?
-
 \begin{figure}[t!]
 \begin{center}
 \includegraphics[width=0.95\textwidth]{./figures/prototype-edit.png}
-
 \end{center}
 \caption{This is a figure.} 
-\label{sample-figure}
+\label{fig:prototype-comparison}
 \end{figure}
 
 
