@@ -1,0 +1,4 @@
+#!/bin/bash
+
+arg="$1"
+pdflatex "$arg" && bibtex "$arg" && pdflatex "$arg" && pdflatex "$arg"
