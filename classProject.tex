@@ -71,7 +71,7 @@
 % abstract
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{abstract}
-We explore the storage of exemplars in associative memory systems as an initial investigation into neural implementations of psychological processes. We outline a recent proposal that probabilistic models of cognition accounting for human behavior at a computational level of analysis can be approximated by existing psychological process models accounting for human behavior at an algorithmic level of analysis, namely, \textit{exemplar models}. Given this motivation, the main contribution of this paper consists of analyzing the dynamics and storage capabilities of two associative models of memory: a Hopfield network, and a Sparse Distributed Memory (SDM) system. We then describe how the mechanics of SDMs can be interpreted probabilistically as a Monte Carlo method called Importance Sampling. We conclude with future directions of this research. 
+We explore the storage of exemplars in associative memory systems as an initial investigation into neural implementations of psychological processes. We outline a recent proposal that probabilistic models of cognition accounting for human behavior at a computational level of analysis can be approximated by existing psychological process models, namely, \textit{exemplar models}. Given this motivation, the main contribution of this paper consists of analyzing the dynamics and storage capabilities of two associative models of memory: a Hopfield network, and a Sparse Distributed Memory (SDM) system. We describe each model in a common mathematical framework and compare their performance  on storage capacity, retrieving prototypes, and retrieving sequences, using both corrupted and uncorrupted stimuli. Finding SDMs to be more robust and powerful computing machines, we then describe how the mechanics of SDMs can be interpreted probabilistically as a Monte Carlo method called Importance Sampling. We conclude with future directions of this research. 
 
 % \textbf{Keywords:} 
 % Sparse Distributed Memory systems, Bayesian inference, Exemplar model, Rational Process Model, Importance Sampling.
@@ -157,35 +157,36 @@ We explore the storage of exemplars in associative memory systems as an initial 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Associative models of memory}
 
-
-
-% for a full discussion, check out
-\cite{Keeler1988}
+Associative models of memory comprise a set of information processing systems with the aim of storing and retrieving data through finding associations in similar patterns of data. We consider two models in particular: a Hopfield network, and a Sparse Distributed Memory (SDM) system. We focus on these two models since Hopfield networks were covered in class; providing a foundation for which to compare to, and the mathematics between these two models has been previously presented in a unified framework \cite{Keeler1988}; allowing us to better understand the differences between each.  We present each model in a similar framework below. For a more detailed exploration between these particular associative memory models, refer to \citeA{Keeler1988}, and for an alternative to SDMs that we do not explore (incorporating Hamming distance on binary patterns), please see \citeA{Lippmann1987}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % subsection - Hopfield networks
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Hopfield networks}
-\cite{Hopfield1982}
 
-% hopfield nets are auto-associative, meaning the whole network converges to one particular pattern given an input and does not leave this state until presented with a new input. 
+Hopfield networks are an autoassociative model of memory, where a set of binary (+1/-1) patterns can be stored in the weights of a neural network and a pattern can be recovered from a noisy stimulus \cite{Hopfield1982}. More formally, given a set of binary patterns $\bf{p}^{\alpha}$ of length $N$, a symmetric $N \times N$ matrix $\bf{T}$ stores these patterns using the outer-product rule: $\bf{T} = \bf{T} + \bf{p}^{\alpha}\,\bf{p}^{\alpha\,'}$. To recover one of these stored patterns, a noisy input $\bf{x}$ is supplied to the network and a stochastic form of Hebbian learning is applied. For each  iteration $t$, a random output node $\bf{z}_{j}$ is selected and updated to (+1/-1) depending on the sign of $\sum_{j=1}^{N} \bf{T}_{ij}\,\bf{z}_{j}$. The Hopfield network architecture is depicted in panel (a) of Figure \ref{neuralNets} below.
 
-% simple math of hopnet (Hebbian learning rule)
-% \begin{figure}[ht!]
-% \begin{center}
-% \includegraphics[width=0.8\textwidth]{./figures/hopfieldTinit.png}
-% 
-% \end{center}
-% \caption{This is a figure.} 
-% \label{sample-figure}
-% \end{figure}
+While the Hopfield network has received popularity for its simplicity as a neural model of memory, a number of limitations have been posited in the literature \cite{Keeler1988}: (1) The storage capacity of a Hopfield network is bounded by a small fraction of the number of processing units - i.e., the length of the input; (2) they cannot handle temporal sequences of patterns; (3) the requirement of symmetric weights in $\bf{T}$ make Hopfield networks  implausible as a model of the brain; and (4) Hopfield networks have limited abilities to store correlated patterns. We explore a number of these concerns in Section 3, our analysis of exemplar storage in Hopfield networks and SDMs.
 
+\begin{center}
+\begin{figure*}[h!]
+{
+	\hfill{}
+	\begin{tabular}{lclclc}
+	\raisebox{1.6in}{(a)} &
+		\includegraphics[width=0.23\textwidth]{./figures/hopfieldNetwork.png} &
+	\raisebox{1.6in}{(b)} &
+		\includegraphics[width=0.27\textwidth]{./figures/sdmNetwork.png} 
+	\raisebox{1.6in}{(c)} &
+		\includegraphics[width=0.29\textwidth]{./figures/sdmOperations.png} &
+	\end{tabular}
+}
+\hfill{}
+\caption{(a) Neural network implementation of a Hopfield network. (b) Neural network implementation of an SDM. Both networks take binary inputs $\bf{x}_{i}$ of length $N$ and produce binary outputs $\bf{z}_{i}$ of length $N$. The Hopfield network uses a set of symmetric weights $\bf{T}_{ij}$ and a Hebbian learning rule to recover an exemplar from a noisy input. The weights between the input and hidden layer in a SDM network determine the set of addresses $\bf{a}_{m}$ to read from or write to, and the second layer of weights store the contents of memory at those addresses. (c) An illustration of the basic read/write operations over SDMs. The outer dotted line represents the space of $2^{N}$ possible addresses while the squares with labels $\bf{A}_{m}$ represent the $M$ sampled hard addresses used for storage. The address being requested for operation is the $\bf{x}$ in the center of the blue circle of radius $H$. The hard addresses selected for operating correspond to the blue squares within the Hamming radius of $\bf{x}$.}
+\label{neuralNets}
+\end{figure*}
+\end{center}
 
-% known issues:
-% (1) storage capacity is small fraction of number of number of neurons
-% (2) can't do temporal sequences
-% (3) unrealistic model of brain - requires symmetric connections
-% (4) bad with correlated patterns
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % subsection - SDM
@@ -193,19 +194,24 @@ We explore the storage of exemplars in associative memory systems as an initial 
 \subsection{Sparse Distributed Memory (SDM) systems}
 
 Sparse Distributed Memory (SDM) systems were developed by \citeA{Kanerva1988,Kanerva1993} as a mathematical model of human memory, exploiting the properties of high-dimensional representational spaces.
-An SDM can function as an \textit{autoassociative}, \textit{content-addressable} memory (associates a pattern with itself) like a Hopfield network, but can additionally function as a \textit{heteroassociative} memory (associates one pattern with another), and as a \textit{sequential-access} memory (in which a temporal sequence of patterns can be stored and retrieved).
+An SDM can function as an \textit{autoassociative}, \textit{content-addressable} memory (associates a pattern with itself) like a Hopfield network, but can additionally function as a \textit{heteroassociative} memory (associates one pattern with another), and as a \textit{sequential-access} memory (in which a temporal sequence of patterns can be stored and retrieved). A simple way to understand how SDMs work follows from an analogy to conventional computer memory. In typical Random-Access Memory (RAM), bit-words of length $N$ are stored in an array of $M = 2^{N}$ registers. To read from or write data to memory, all that is needed is the data itself (the \textit{contents} of memory), and the location that points to this content (the \textit{address}). This limits the amount of storage in memory (since $M$ is fixed based on the length a word) and the contents in memory have nothing to do with their address in memory (thus one cannot determine the similarity of memory content based their addresses). SDMs were developed to overcome this limitation and to encapsulate the notion that distances between concepts in memory correspond to distances between points in high-dimensional space \cite{Kanerva1988}. Instead of storing and reading data in a sequentially-enumerated set of $M = 2^{N}$ address registers, an SDM considers very bit-words of length $N$ (typically $N > 100$) and samples a very large number $M >> N$ set of hard addresses to use as registers from the space of $2^{N}$ possible addresses. Each point in this sampled space of addresses will be far away from most other points in the sample space (as measured by Hamming distance).
 
-A simple way to understand how SDMs work follows from an analogue to conventional computer memory.
+To store a set of binary patterns $\bf{p}^{\alpha}$ of length $N$ in an autoassociative SDM, an address $\bf{a}$ and data $\bf{d}$ must be supplied for each pattern corresponding to a tuple ($\bf{x}^{\alpha}$, $\bf{w}^{\alpha}$), where $\bf{x}^{\alpha}$ = $\bf{w}^{\alpha}$. When acting as a heteroassociative or sequential-access memory system, this equality need not be held. Since the set of $M$ hard addresses does not enumerate the total space of $2^{N}$, a particular address $\bf{x}^{\alpha}$ has high probability of not existing in the sampled addresses space. Thus, existing hard addresses near $\bf{x}^{\alpha}$ are selected for access if they are within a Hamming radius $H$ of $\bf{x}^{\alpha}$, where $H$ represents the number of different bits allowed between points. The contents of these selected addresses are then modified to store the pattern $\bf{w}^{\alpha}$ such that each bit in the contents is increased or decreased by 1 depending on whether or not that bit in the pattern is a 1 or 0, respectively. To read a binary pattern $\bf{z}$ out of memory from address $\bf{x}$, a similar selection procedure is carried out in which a set of hard addresses within a Hamming radius of $\bf{x}$ are accessed, and a bit $j$ in the output $\bf{z}$ is set to 1 or 0 if the sum of the contents in position $j$ over these selected addresses is greater than or less 0, respectively. A neural network implementation of an SDM and an illustrative schematic of an SDM's operation are provided in panels (b) and (c) of Figure \ref{neuralNets} above.
+
+More formally, given a set of binary patterns $\bf{p}^{\alpha}$ of length $N$ in the form ($\bf{x}^{\alpha}$, $\bf{w}^{\alpha}$), an SDM can be constructed as a neural network with $N$ units in the input layer, a hidden layer with $M$ units for each sampled hard addresses, and an output layer with $N$ units. The weights between the input and hidden layer correspond to the $M \times N$ matrix $\bf{A}$ of hard-addresses, and the weights between the hidden and output layer correspond to the $M \times N$ matrix $\bf{C}$ of contents stored at each address. The rule for writing $\bf{w}^{\alpha}$ to memory address $\bf{x}^{\alpha}$ is expressed as:
+\begin{align}
+ \bf{y}^{\alpha} &= \Theta_{H}(\bf{A}\,\bf{x}^{\alpha}) \\	
+ \bf{C} &= \bf{w}^{\alpha}\,\bf{y}^{\alpha} 
+\end{align}
+
+\noindent where $\bf{y}^{\alpha}$ is a binary vector of length $M$ with a 1 in position $j$ if hard address $\bf{a}$ is within Hamming distance $H$ of $\bf{x}^{\alpha}$. The rule for reading $\bf{z}$ from memory address $\bf{x}$ is expressed as:
+\begin{align}
+ \bf{y} &= \Theta_{H}(\bf{A}\,\bf{x}) \\	
+ \bf{z} &= g(\bf{C}\,\bf{y}) 
+\end{align}
+\noindent where $g(x_{i}) = 1$ if $x_{i} > 0$ and $0$ if $x_{i} \leq 0$.  
 
 
-% \begin{figure}[t!]
-% \begin{center}
-% \includegraphics[width=0.5\textwidth]{./figures/sdmOperations.png}
-
-% \end{center}
-% \caption{An illustration of the basic read/write operations over SDMs. The outer dotted line represents the space of $2^{N}$ possible addresses while the squares with labels $A_{m}$ represent the $M$ sampled hard addresses used for storage. The address being requested for operation is the $X$ in the center of the blue circle of radius $H$. The hard addresses selected for operating correspond to the blue squares within the Hamming radius of $X$.} 
-% \label{sdmBasics}
-% \end{figure}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -213,24 +219,7 @@ A simple way to understand how SDMs work follows from an analogue to conventiona
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Exemplar storage in associative memory systems}
 
-\begin{center}
-\begin{figure*}[tb]
-{
-	\hfill{}
-	\begin{tabular}{lclclc}
-	\raisebox{2.0in}{(a)} &
-		\includegraphics[width=0.24\textwidth]{./figures/hopfieldNetwork.png} &
-	\raisebox{2.0in}{(b)} &
-		\includegraphics[width=0.27\textwidth]{./figures/sdmNetwork.png} 
-	\raisebox{2.0in}{(c)} &
-		\includegraphics[width=0.29\textwidth]{./figures/sdmOperations.png} &
-	\end{tabular}
-}
-\hfill{}
-\caption{Neural network implementations of a Hopfield network (panel a) and an SDM (panel b).}
-\label{neuralNets}
-\end{figure*}
-\end{center}
+
 
 We compared the Hopfield and SDM models using several different
 metrics to gauge their fitness as exemplar storage systems.
@@ -269,9 +258,9 @@ more error-prone than the Hopfield network. We suspect this is due to
 {
 	\hfill{}
 	\begin{tabular}{lclc}
-	\raisebox{2in}{(a)} &
+	\raisebox{1.75in}{(a)} &
 		\includegraphics[width=0.4\textwidth]{./figures/capacity-edit.png}
-	\raisebox{2in}{(b)} &
+	\raisebox{1.75in}{(b)} &
 		\includegraphics[width=0.4\textwidth]{./figures/tolerance-edit.png} 
 	\end{tabular}
 }
@@ -466,7 +455,8 @@ Thus, in the limit, the expected value that we read out will be:
 \subsection{Empirical comparison}
 
 To verify this formulation of the SDM as an importance sampler, we 
-
+\\
+Additionally, since SDMs can function as a \textit{heteroassociative} memory, where \textit{address} and \textit{content} do not need to be the same ..
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  conclusions
