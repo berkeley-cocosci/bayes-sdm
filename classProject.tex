@@ -63,6 +63,10 @@
 
 \date{}
 
+\makeatletter
+\@fpsep\textheight
+\makeatother
+
 \begin{document}
 
 \maketitle
@@ -168,24 +172,36 @@ Hopfield networks are an autoassociative model of memory, where a set of binary 
 
 While the Hopfield network has received popularity for its simplicity as a neural model of memory, a number of limitations have been posited in the literature \cite{Keeler1988}: (1) The storage capacity of a Hopfield network is bounded by a small fraction of the number of processing units - i.e., the length of the input; (2) they cannot handle temporal sequences of patterns; (3) the requirement of symmetric weights in $\bf{T}$ make Hopfield networks  implausible as a model of the brain; and (4) Hopfield networks have limited abilities to store correlated patterns. We explore a number of these concerns in Section 3, our analysis of exemplar storage in Hopfield networks and SDMs.
 
-\begin{center}
-\begin{figure*}[h!]
-{
-	\hfill{}
-	\begin{tabular}{lclclc}
-	\raisebox{1.6in}{(a)} &
-		\includegraphics[width=0.23\textwidth]{./figures/hopfieldNetwork.png} &
-	\raisebox{1.6in}{(b)} &
-		\includegraphics[width=0.27\textwidth]{./figures/sdmNetwork.png} 
-	\raisebox{1.6in}{(c)} &
-		\includegraphics[width=0.29\textwidth]{./figures/sdmOperations.png} &
-	\end{tabular}
-}
-\hfill{}
-\caption{(a) Neural network implementation of a Hopfield network. (b) Neural network implementation of an SDM. Both networks take binary inputs $\bf{x}_{i}$ of length $N$ and produce binary outputs $\bf{z}_{i}$ of length $N$. The Hopfield network uses a set of symmetric weights $\bf{T}_{ij}$ and a Hebbian learning rule to recover an exemplar from a noisy input. The weights between the input and hidden layer in a SDM network determine the set of addresses $\bf{a}_{m}$ to read from or write to, and the second layer of weights store the contents of memory at those addresses. (c) An illustration of the basic read/write operations over SDMs. The outer dotted line represents the space of $2^{N}$ possible addresses while the squares with labels $\bf{A}_{m}$ represent the $M$ sampled hard addresses used for storage. The address being requested for operation is the $\bf{x}$ in the center of the blue circle of radius $H$. The hard addresses selected for operating correspond to the blue squares within the Hamming radius of $\bf{x}$.}
+\begin{figure}[h!]
+  \begin{center}
+    \begin{tabular}{lclclc}
+      \raisebox{1.6in}{(a)} &
+      \includegraphics[width=0.23\textwidth]{./figures/hopfieldNetwork.png} &
+      \raisebox{1.6in}{(b)} &
+      \includegraphics[width=0.27\textwidth]{./figures/sdmNetwork.png} 
+      \raisebox{1.6in}{(c)} &
+      \includegraphics[width=0.29\textwidth]{./figures/sdmOperations.png} &
+    \end{tabular}
+    \caption{(a) Neural network implementation of a Hopfield
+      network. (b) Neural network implementation of an SDM. Both
+      networks take binary inputs $\bf{x}_{i}$ of length $N$ and
+      produce binary outputs $\bf{z}_{i}$ of length $N$. The Hopfield
+      network uses a set of symmetric weights $\bf{T}_{ij}$ and a
+      Hebbian learning rule to recover an exemplar from a noisy
+      input. The weights between the input and hidden layer in a SDM
+      network determine the set of addresses $\bf{a}_{m}$ to read from
+      or write to, and the second layer of weights store the contents
+      of memory at those addresses. (c) An illustration of the basic
+      read/write operations over SDMs. The outer dotted line
+      represents the space of $2^{N}$ possible addresses while the
+      squares with labels $\bf{A}_{m}$ represent the $M$ sampled hard
+      addresses used for storage. The address being requested for
+      operation is the $\bf{x}$ in the center of the blue circle of
+      radius $H$. The hard addresses selected for operating correspond
+      to the blue squares within the Hamming radius of $\bf{x}$.}
 \label{neuralNets}
-\end{figure*}
 \end{center}
+\end{figure}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -219,7 +235,7 @@ More formally, given a set of binary patterns $\bf{p}^{\alpha}$ of length $N$ in
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Exemplar storage in associative memory systems}
 
-\begin{figure}[tb]
+\begin{figure}[t!]
   \begin{center}
     \begin{tabular}{lclclc}
       \raisebox{2.0in}{(a)} &
@@ -227,7 +243,7 @@ More formally, given a set of binary patterns $\bf{p}^{\alpha}$ of length $N$ in
       \raisebox{2.0in}{(b)} &
       \includegraphics[width=0.27\textwidth]{./figures/sdmNetwork.png} &
       \raisebox{2.0in}{(c)} &
-      \includegraphics[width=0.29\textwidth]{./figures/sdmOperations.png} &
+      \includegraphics[width=0.29\textwidth]{./figures/sdmOperations.png}
     \end{tabular}
     \caption{Neural network implementations of a Hopfield network
       (panel a) and an SDM (panel b).}
@@ -267,22 +283,20 @@ Interestingly, at higher levels of noise, the SDM is significantly
 more error-prone than the Hopfield network. We suspect this is due to
 
 
-\begin{center}
 \begin{figure}[t!]
-{
-	\hfill{}
-	\begin{tabular}{lclc}
-	\raisebox{1.75in}{(a)} &
-		\includegraphics[width=0.4\textwidth]{./figures/capacity-edit.png}
-	\raisebox{1.75in}{(b)} &
-		\includegraphics[width=0.4\textwidth]{./figures/tolerance-edit.png} 
-	\end{tabular}
-}
-\hfill{}
-\caption{SDM and Hopfield network capacities (panel a) and error tolerances (panel b).}
-\label{fig:capacity}
+  \begin{center}
+    % \begin{tabular}{lclc}
+    %   \raisebox{1.75in}{(a)} &
+    %   \includegraphics[width=0.4\textwidth]{./figures/capacity-edit.png}
+    %   \raisebox{1.75in}{(b)} &
+    %   \includegraphics[width=0.4\textwidth]{./figures/tolerance-edit.png} 
+    % \end{tabular}
+    \includegraphics[width=0.9\textwidth]{./figures/all-capacities.png}
+    \caption{SDM and Hopfield network capacities (panel a) and error
+      tolerances (panel b).}
+    \label{fig:capacity}
+  \end{center}
 \end{figure}
-\end{center}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -324,33 +338,31 @@ corruption of no more than $5\%$ (in the case of the SDM, it is
 accurate even at $10\%$, consistent with the example in
 Fig. \ref{fig:prototypes}). At high levels of corruption and low
 numbers of exemplars, the Hopfield network actually outperforms the
-SDM; with more exemplars, the SDM quickly recovers, however. 
+SDM; however, with more exemplars, the SDM quickly recovers.
 
-\begin{center}
-\begin{figure*}[t!]
-{
-	\hfill{}
-	\begin{tabular}{ l l l c}
-	\raisebox{2.5in}{(a)} &
-		\includegraphics[width=0.43\textwidth]{./figures/exemplars.png} &
-	\raisebox{2.5in}{(b)} &
-		\includegraphics[width=0.4\textwidth]{./figures/prototypeResults.png} \\
-	%	\includegraphics[width=0.4\textwidth]{./figures/vi_sdm.png} 
-	\end{tabular}
-}
-\hfill{}
-\caption{(a) Nine noisy exemplars stored in both SDM and Hopfield models. (b) The retrieval results for the Hopfield network (top) and SDM network (bottom) when queried with a noisy word.}
-\label{fig:prototypes}
-\end{figure*}
-\end{center}
+\begin{figure}[t!]
+  \begin{center}
+    \begin{tabular}{ l l l c}
+      \raisebox{2.5in}{(a)} &
+      \includegraphics[width=0.43\textwidth]{./figures/exemplars.png} &
+      \raisebox{2.5in}{(b)} &
+      \includegraphics[width=0.4\textwidth]{./figures/prototypeResults.png} \\
+      %	\includegraphics[width=0.4\textwidth]{./figures/vi_sdm.png} 
+    \end{tabular}
+    \caption{(a) Nine noisy exemplars stored in both SDM and Hopfield
+      models. (b) The retrieval results for the Hopfield network (top)
+      and SDM network (bottom) when queried with a noisy word.}
+    \label{fig:prototypes}
+  \end{center}
+\end{figure}
 
 
 \begin{figure}[t!]
-\begin{center}
-\includegraphics[width=0.95\textwidth]{./figures/prototype-edit.png}
-\end{center}
-\caption{This is a figure.} 
-\label{fig:prototype-comparison}
+  \begin{center}
+    \includegraphics[width=0.95\textwidth]{./figures/prototype-edit.png}
+  \end{center}
+  \caption{This is a figure.} 
+  \label{fig:prototype-comparison}
 \end{figure}
 
 
@@ -360,23 +372,21 @@ SDM; with more exemplars, the SDM quickly recovers, however.
 \subsection{Sequence Storage}
 
 % just to show off here since the hopnet can't at all - but maybe we should make a comment about recurrent nets (JUST a comment) ?
-\begin{center}
-\begin{figure*}[t!]
-{
-	\hfill{}
-	\begin{tabular}{ l c }
-	\raisebox{4.1in}{(a)} &
-		\includegraphics[width=0.8\textwidth]{./figures/exemplarStoredSequences.png} \vspace{25bp} 
-		\\
-	\raisebox{.6in}{(b)} &
-		\includegraphics[width=0.8\textwidth]{./figures/prototypeRetrievedSequence.png} 
-	\end{tabular}
-}
-\hfill{}
-\caption{(a) Exemplars of noisy sequences stored in SDM memory. (b) Retrieval of prototypical sequence in SDM from a noisy word.}
-\label{sequences}
-\end{figure*}
-\end{center}
+\begin{figure}[t!]
+  \begin{center}
+    \begin{tabular}{ l c }
+      \raisebox{4.1in}{(a)} &
+      \includegraphics[width=0.8\textwidth]{./figures/exemplarStoredSequences.png} \vspace{25bp} 
+      \\
+      \raisebox{.6in}{(b)} &
+      \includegraphics[width=0.8\textwidth]{./figures/prototypeRetrievedSequence.png} 
+    \end{tabular}
+    \caption{(a) Exemplars of noisy sequences stored in SDM
+      memory. (b) Retrieval of prototypical sequence in SDM from a
+      noisy word.}
+    \label{sequences}
+  \end{center}
+\end{figure}
 
 
 
@@ -401,10 +411,6 @@ SDM; with more exemplars, the SDM quickly recovers, however.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Probabilistic interpretations of SDMs}
 
-% *** probabilistic interpretations \cite{Anderson1989}\\
-% *** figure out the encoding for importance sampling \\
-% *** how close does it have to be to the delta function? \\
-
 Exemplar models have more potential than uniformly storing data and
 recovering its mean. \citeA{Shi2010} demonstrated that exemplar models
 can be used to implement \textit{importance sampling}, a Monte Carlo
@@ -415,6 +421,13 @@ suggesting that it should be possible to adjust that formalization to
 specifically encompass exemplar-based approximate inference. Here, we
 extend the idea of using exemplar models for importance sampling in
 the context of SDMs.
+
+We note that an important property of SDM, which is that they can
+function as a \textit{heteroassociative} memory, where
+\textit{address} and \textit{content} do not need to be the
+same. Although we treat data and addresses as equivalent here, the
+formulation of the SDM as an importance sampler is general and will
+work even when the stored data is distinct from its address.
 
 \subsection{Overview}
 
@@ -496,11 +509,10 @@ Thus, in the limit, the expected value that we read out will be:
 \mathbb{E}[y|x]\propto \sum_i\ y_i\Pr(x|x_i^*)
 \end{equation}
 
-\subsection{Empirical comparison}
+% \subsection{Empirical comparison}
 
-To verify this formulation of the SDM as an importance sampler, we 
-\\
-Additionally, since SDMs can function as a \textit{heteroassociative} memory, where \textit{address} and \textit{content} do not need to be the same ..
+% To verify this formulation of the SDM as an importance sampler, we
+% \\
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  conclusions
@@ -508,39 +520,10 @@ Additionally, since SDMs can function as a \textit{heteroassociative} memory, wh
 \section{Conclusions}
 
 
-
-% \begin{table}[!ht]
-% \begin{center} 
-% \caption{Sample table title.} 
-% \label{sample-table} 
-% \vskip 0.12in
-% \begin{tabular}{ll} 
-% \hline
-% Error type    &  Example \\
-% \hline
-% Take smaller        &   63 - 44 = 21 \\
-% Always borrow~~~~   &   96 - 42 = 34 \\
-% 0 - N = N           &   70 - 47 = 37 \\
-% 0 - N = 0           &   70 - 47 = 30 \\
-% \hline
-% \end{tabular} 
-% \end{center} 
-% \end{table}
-
-% \begin{figure}[ht]
-% \begin{center}
-% \fbox{CoGNiTiVe ScIeNcE}
-% \end{center}
-% \caption{This is a figure.} 
-% \label{sample-figure}
-% \end{figure}
-
-
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % bibliography
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \newpage
 \bibliographystyle{apacite}
 
