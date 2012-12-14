@@ -190,25 +190,6 @@ While the Hopfield network has received popularity for its simplicity as a neura
 \end{center}
 \end{figure}
 
-
-\begin{figure}[t!]
-  \begin{center}
-    \includegraphics[width=0.9\textwidth]{./figures/all-capacities.png}
-    \caption{SDM and Hopfield network capacities. The left plot (a)
-      shows the storage capacities of uncorrupted inputs for the
-      Hopfield network (dashed line) and SDMs with different address
-      space sizes (solid lines). With small address spaces, the SDM
-      quickly suffers with relatively high corruption. However, with
-      sufficiently large address spaces, the SDM is much more accurate
-      than the Hopfield network, being able to store 200 items with
-      barely $1\%$ corruption. The right plot (b) shows storage
-      capacity when items are read using a corrupted input for
-      different levels of corruption.}
-    \label{fig:capacity}
-  \end{center}
-\end{figure}
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % subsection - SDM
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -237,6 +218,24 @@ More formally, given a set of binary patterns $\bf{p}^{\alpha}$ of length $N$ in
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Exemplar storage in associative memory systems}
 
+
+\begin{figure}[t!]
+  \begin{center}
+    \includegraphics[width=0.9\textwidth]{./figures/all-capacities.png}
+    \caption{SDM and Hopfield network capacities. The left plot (a)
+      shows the storage capacities of uncorrupted inputs for the
+      Hopfield network (dashed line) and SDMs with different address
+      space sizes (solid lines). With small address spaces, the SDM
+      quickly suffers with relatively high corruption. However, with
+      sufficiently large address spaces, the SDM is much more accurate
+      than the Hopfield network, being able to store 200 words with
+      barely $1\%$ corruption. The right plot (b) shows storage
+      capacity when words are read using a corrupted input for
+      different levels of corruption.}
+    \label{fig:capacity}
+  \end{center}
+\end{figure}
+
 We compared the Hopfield and SDM models using several different
 metrics to gauge their fitness as exemplar storage systems.
 
@@ -244,22 +243,6 @@ metrics to gauge their fitness as exemplar storage systems.
 % subsection - capacity
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Storage Capacity}
-
-\begin{figure}[t!]
-  \begin{center}
-    \begin{tabular}{ l l l c}
-      \raisebox{2.5in}{(a)} &
-      \includegraphics[width=0.43\textwidth]{./figures/exemplars.png} &
-      \raisebox{2.5in}{(b)} &
-      \includegraphics[width=0.4\textwidth]{./figures/prototypeResults.png} \\
-      %	\includegraphics[width=0.4\textwidth]{./figures/vi_sdm.png} 
-    \end{tabular}
-    \caption{(a) Nine noisy exemplars stored in both SDM and Hopfield
-      models. (b) The retrieval results for the Hopfield network (top)
-      and SDM network (bottom) when queried with a noisy word.}
-    \label{fig:prototypes}
-  \end{center}
-\end{figure}
 
 First, we explored the upper bound of storage capacity of the SDM
 versus the Hopfield network by generating $k$ random, uncorrelated
@@ -281,14 +264,28 @@ shows these results for different levels of corruption. At low levels
 of corruption, the SDM is more resistant to corrupted inputs than the
 Hopfield net. 
 
-Interestingly, at higher levels of noise, the SDM is significantly
-more error-prone than the Hopfield network. We suspect this is due to
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % subsection - prototypes
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Prototype Retrieval}
+
+
+\begin{figure}[t!]
+  \begin{center}
+    \begin{tabular}{ l l l c}
+      \raisebox{2.5in}{(a)} &
+      \includegraphics[width=0.43\textwidth]{./figures/exemplars.png} &
+      \raisebox{2.5in}{(b)} &
+      \includegraphics[width=0.4\textwidth]{./figures/prototypeResults.png} \\
+      %	\includegraphics[width=0.4\textwidth]{./figures/vi_sdm.png} 
+    \end{tabular}
+    \caption{(a) Nine noisy exemplars stored in both SDM and Hopfield
+      models. (b) The retrieval results for the Hopfield network (top)
+      and SDM network (bottom) when queried with a noisy word.}
+    \label{fig:prototypes}
+  \end{center}
+\end{figure}
+
 
 One feature of associative memory systems is the ``averaging'' effect:
 as more vectors are stored in the memory, vectors that are close to
@@ -377,15 +374,46 @@ SDM storage consists of writing and reading binary patterns $\bf{w}^{\alpha}$ at
 %%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Discussion}
 
-% wrap up results from evaluations
+To summarize, we compared the SDM and the Hopfield network on storage
+capacity for uncorrupted and corrupted inputs and on prototype
+retrieval. In most cases, the SDM outperformed the Hopfield
+network. Interestingly, however, is the capacity when retrieving with
+corrupted inputs or prototype retrivel. At higher levels of noise, the
+SDM is actually more error-prone than the Hopfield network in these
+scenarios. We suspect this is due to an overlap between the corrupted
+input and the hamming radius of a different stored word. More
+specifically, if we flip exactly $b$ bits, then the word will be
+located along an edge in space that is $b$ bits away from the actual
+stored word in Hamming distance. At $20\%$ corruption, the Hamming
+radius for activating addresses is approximately $2b$. Thus, although
+the Hamming radius of one word does not include another word, it is
+not unlikely that that radius will overlap the ``corruption radius'';
+thus resulting in a retrieved vector that is somewhere in between the
+two stored words.
 
-% ** SDM is the best \\
-% only the only model that is both robust to noise/storage capacity and
-% sophisticated enough to behave in various ways 
+Because the SDM has poor performance at high levels of noise, it is
+less ideal than the Hopfield network when storing only one version of
+each word. If a sufficient number of exemplars can be stored, however,
+it the SDM is clearly superior: with enough exemplars, it can almost
+perfectly reconstruct a prototype, whereas the Hopfield net will
+always result in some corruption regardless of the number of
+prototypes.
 
-** difference between addresses and data \\
-% - address/data difference is called heteroassociative memory (associate one pattern with another - i think...)
+A further benefit of the SDM over the Hopfield network is its ability
+to store sequences. This is the result of an important property of the
+SDM, which is that it can function as a \textit{heteroassociative}
+memory, where \textit{address} and \textit{content} do not need to be
+the same. Hopfield networks do not have this capability, and therefore
+are limited in the data structures they can store.
 
+One downside of the SDM is that it is less efficient than the Hopfield
+network. We used an address space size of 10000, which is not
+atypical. With such a large address space, however, comes a large
+computational overhead. However, if memory and computation are not an
+issue, then the SDM is clearly a better choice over the Hopfield
+network: it is for the most part more accurate, it has a higher
+capacity, and it is capable of much more sophisticated behavior than
+the Hopfield network.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -403,13 +431,6 @@ suggesting that it should be possible to adjust that formalization to
 specifically encompass exemplar-based approximate inference. Here, we
 extend the idea of using exemplar models for importance sampling in
 the context of SDMs.
-
-We note that an important property of SDM, which is that they can
-function as a \textit{heteroassociative} memory, where
-\textit{address} and \textit{content} do not need to be the
-same. Although we treat data and addresses as equivalent here, the
-formulation of the SDM as an importance sampler is general and will
-work even when the stored data is distinct from its address.
 
 \subsection{Overview}
 
@@ -515,14 +536,14 @@ Thus, in the limit, the expected value that we read out will be:
 \bibliography{classProject}
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% appendix (code)
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newpage
-\appendix
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% % appendix (code)
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \newpage
+% \appendix
 
-\section{Project Code}
-This is where we have the code.
+% \section{Project Code}
+% This is where we have the code.
 
 
 \end{document}
