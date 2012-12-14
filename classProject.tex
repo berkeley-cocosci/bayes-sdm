@@ -522,6 +522,32 @@ Thus, in the limit, the expected value that we read out will be:
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Conclusions}
 
+In this paper, we compared two associative memory systems: Hopfield
+networks and Sparse Distributed Memory (SDM). We found that the SDM
+was largely superior to Hopfield networks in terms of storage
+capacity, error tolerance during retrieval, and accuracy in prototye
+reconstruction. Moreover, the SDM is capable of storing complicated
+data structures -- such as linked lists -- due to its separation of
+addresses and contents.  These structures are not possible in Hopfield
+networks, which do not separate contents from addresses. Thus, given a
+choice of associative memory, SDMs seem the clear victor.
+
+Given the robustness of SDMs, we took them one step further and
+explored their potential to be used for Bayesian
+inference. Associative memory is conducive to exemplar storage, and
+exemplar models have previously been shown to approximate Bayesian
+inference via importance sampling \cite{Shi2010}. Thus, SDMs should
+similarly be able to perform importance sampling. We formalized this
+notion mathematically, laying a foundation for future work which will
+empirically test SDM importance samplers. In particular, this will
+involve an investigation into the choice of a likelihood function. An
+immediate question is: is it possible to find an encoding of the data
+into binary vectors which results in an approximation that is
+equivalent to the approximation obtained by changing the likelihood
+function? If it is, this would make importance sampling in a SDM much
+more flexible and generic by not requiring a change in read
+probabilities.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % bibliography
