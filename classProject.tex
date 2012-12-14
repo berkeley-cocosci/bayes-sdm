@@ -71,7 +71,7 @@
 % abstract
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{abstract}
-This is the abstract.
+We explore the storage of exemplars in associative memory systems as an initial investigation into neural implementations of psychological processes. We outline a recent proposal that probabilistic models of cognition accounting for human behavior at a computational level of analysis can be approximated by existing psychological process models accounting for human behavior at an algorithmic level of analysis, namely, \textit{exemplar models}. Given this motivation, the main contribution of this paper consists of analyzing the dynamics and storage capabilities of two associative models of memory: a Hopfield network, and a Sparse Distributed Memory (SDM) system. We then describe how the mechanics of SDMs can be interpreted probabilistically as a Monte Carlo method called Importance Sampling. We conclude with future directions of this research. 
 
 % \textbf{Keywords:} 
 % Sparse Distributed Memory systems, Bayesian inference, Exemplar model, Rational Process Model, Importance Sampling.
@@ -171,6 +171,14 @@ This is the abstract.
 % hopfield nets are auto-associative, meaning the whole network converges to one particular pattern given an input and does not leave this state until presented with a new input. 
 
 % simple math of hopnet (Hebbian learning rule)
+% \begin{figure}[ht!]
+% \begin{center}
+% \includegraphics[width=0.8\textwidth]{./figures/hopfieldTinit.png}
+% 
+% \end{center}
+% \caption{This is a figure.} 
+% \label{sample-figure}
+% \end{figure}
 
 
 % known issues:
@@ -182,10 +190,22 @@ This is the abstract.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % subsection - SDM
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Sparse distributed memory systems}
-\cite{Kanerva1988,Kanerva1993}
+\subsection{Sparse Distributed Memory (SDM) systems}
 
-% SDMs can be a whole range of foo-associative
+Sparse Distributed Memory (SDM) systems were developed by \citeA{Kanerva1988,Kanerva1993} as a mathematical model of human memory, exploiting the properties of high-dimensional representational spaces.
+An SDM can function as an \textit{autoassociative}, \textit{content-addressable} memory (associates a pattern with itself) like a Hopfield network, but can additionally function as a \textit{heteroassociative} memory (associates one pattern with another), and as a \textit{sequential-access} memory (in which a temporal sequence of patterns can be stored and retrieved).
+
+A simple way to understand how SDMs work follows from an analogue to conventional computer memory.
+
+
+\begin{figure}[ht!]
+\begin{center}
+\includegraphics[width=0.5\textwidth]{./figures/sdmOperations.png}
+
+\end{center}
+\caption{An illustration of the basic read/write operations over SDMs. The outer dotted line represents the space of $2^{N}$ possible addresses while the squares with labels $A_{m}$ represent the $M$ sampled hard addresses used for storage. The address being requested for operation is the $X$ in the center of the blue circle of radius $H$. The hard addresses selected for operating correspond to the blue squares within the Hamming radius of $X$.} 
+\label{sdmBasics}
+\end{figure}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -193,7 +213,24 @@ This is the abstract.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Exemplar storage in associative memory systems}
 
-** Parameters \\
+\begin{center}
+\begin{figure*}[tb]
+{
+	\hfill{}
+	\begin{tabular}{lclc}
+	\raisebox{2.0in}{(a)} &
+		\includegraphics[width=0.3\textwidth]{./figures/hopfieldNetwork.png} &
+	\raisebox{2.0in}{(b)} &
+		\includegraphics[width=0.35\textwidth]{./figures/sdmNetwork.png} 
+	\end{tabular}
+}
+\hfill{}
+\caption{Neural network implementations of a Hopfield network (panel a) and an SDM (panel b).}
+\label{neuralNets}
+\end{figure*}
+\end{center}
+
+\noindent** Parameters \\
 *** size of address space (think this compares to number of hidden units in others) \\
 *** \# exemplars \\
 *** \% bits corrupt \\
@@ -204,25 +241,25 @@ This is the abstract.
 \subsection{Storage Capacity}
 ** retrieval using corrupted and uncorrupted inputs \\
 
-\begin{figure}[ht!]
+
 \begin{center}
-\includegraphics[width=0.8\textwidth]{./figures/capacity-edit.png}
-
+\begin{figure*}[ht!]
+{
+	\hfill{}
+	\begin{tabular}{ l c }
+	\raisebox{3.75in}{(a)} &
+		\includegraphics[width=0.8\textwidth]{./figures/capacity-edit.png} \vspace{20bp}
+		\\
+	\raisebox{3.2in}{(b)} &
+		\includegraphics[width=0.8\textwidth]{./figures/tolerance-edit.png} 
+	\end{tabular}
+}
+\hfill{}
+\caption{SDM and Hopfield network capacities (panel a) and error tolerances (panel b).}
+\label{capacityAndErrorTolerance}
+\end{figure*}
 \end{center}
-\caption{This is a figure.} 
-\label{sample-figure}
-\end{figure}
 
-
-\begin{figure}[ht!]
-\begin{center}
-	
-\includegraphics[width=0.8\textwidth]{./figures/tolerance-edit.png}
-
-\end{center}
-\caption{This is a figure.} 
-\label{sample-figure}
-\end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % subsection - prototypes
@@ -230,6 +267,26 @@ This is the abstract.
 \subsection{Prototype Retrieval}
 
 % what happens when we try to store the noisy circles in an hopnet, does it converge to a prototype as well?
+
+
+\begin{center}
+\begin{figure*}[ht!]
+{
+	\hfill{}
+	\begin{tabular}{ l l l c}
+	\raisebox{2.5in}{(a)} &
+		\includegraphics[width=0.43\textwidth]{./figures/exemplars.png} &
+	\raisebox{2.5in}{(b)} &
+		\includegraphics[width=0.4\textwidth]{./figures/prototypeResults.png} \\
+	%	\includegraphics[width=0.4\textwidth]{./figures/vi_sdm.png} 
+	\end{tabular}
+}
+\hfill{}
+\caption{(a) Nine noisy exemplars stored in both SDM and Hopfield models. (b) The retrieval results for the Hopfield network (top) and SDM network (bottom) when queried with a noisy word.}
+\label{prototypes}
+\end{figure*}
+\end{center}
+
 
 % - even if it does, it can't really store much else without really messing things up due to its capacity, where in SDM it's just a tiny fraction of the space of things - ie, does storing noisy faces, numbers, circles, AND sequences do anything to the retrieval of the prototype?
 
@@ -249,6 +306,24 @@ This is the abstract.
 \subsection{Sequence Storage}
 
 % just to show off here since the hopnet can't at all - but maybe we should make a comment about recurrent nets (JUST a comment) ?
+\begin{center}
+\begin{figure*}[ht!]
+{
+	\hfill{}
+	\begin{tabular}{ l c }
+	\raisebox{4.1in}{(a)} &
+		\includegraphics[width=0.8\textwidth]{./figures/exemplarStoredSequences.png} \vspace{25bp} 
+		\\
+	\raisebox{.6in}{(b)} &
+		\includegraphics[width=0.8\textwidth]{./figures/prototypeRetrievedSequence.png} 
+	\end{tabular}
+}
+\hfill{}
+\caption{(a) Exemplars of noisy sequences stored in SDM memory. (b) Retrieval of prototypical sequence in SDM from a noisy word.}
+\label{sequences}
+\end{figure*}
+\end{center}
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%
