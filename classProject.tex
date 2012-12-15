@@ -170,7 +170,7 @@ Having reviewed the formal descriptions of a Hopfield network and an
 SDM, we now turn to evaluation of these models using several different
 metrics to gauge their fitness as exemplar storage systems. In all
 analyses, we used an address length of $N=256$ and, for the SDM, a
-Hamming radius of $D=112$.
+Hamming radius of $H=112$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % subsection - capacity
@@ -263,9 +263,9 @@ unobserved ``ideal'' input. Exemplars are corrupted (or atypical)
 observations of this input.
 
 Panel (a) in Figure \ref{fig:prototypes} shows nine exemplars of the
-``VI'' roman numeral, each with 25 corrupted bits ($\approx10\%$) ,
+``VI'' roman numeral, each with 25 corrupted bits ($\approx10\%$),
 which were stored in the SDM and Hopfield network. Panel (b) in Figure
-\ref{fig:prototypes}b shows the result of querying each network with
+\ref{fig:prototypes} shows the result of querying each network with
 another corrupted exemplar: both return vectors that approach the true
 prototype and have much less corruption than any of the exemplars. In
 this particular example, the SDM is perfectly able to retrieve the
@@ -332,7 +332,7 @@ SDM; however, with more exemplars, the SDM quickly recovers.
 
 Hopfield networks typically function only as autoassociative memory systems, whereas SDMs can associate one pattern with another, acting as a heteroassociative memory. We demonstrate this capability in an SDM by storing and retrieving temporal sequences of patterns.
 
-SDM storage consists of writing and reading binary patterns $\bf{w}^{\alpha}$ at addresses given by $\bf{x}^{\alpha}$. When both pattern and address space consist of the same length of bits, $N$, there are no restrictions prohibiting $\bf{w}^{\alpha}$ to be an address pointing elsewhere in memory. Thus, if one sets $\bf{w}^{\alpha} = \bf{x}^{\alpha+1}$, we can store data as a linked list and retrieve it sequentially. Below in panel (a) of Figure \ref{sequences} we display example sequences of noisy stimuli. Here, each image of a roman numeral (well, technically zero is not a roman numeral) corresponds to a binary pattern of length $256$ and corrupted by $25$ bits ($\approx 10\%$ noise). When writing these patterns to memory, the next numeral's address was stored as the content for the current numeral's address. Consequently, when this SDM is queried with a corrupted numeral, it retrieves the stored sequence of roman numerals following the queried numeral. Furthermore, as shown in panel (b) of Figure \ref{sequences}, these retrieved addresses correspond to the prototype for each numeral stored as an exemplar (in this particular example, there were $10$ noisy sequences stored in an SDM with $M=10,000$).
+SDM storage consists of writing and reading binary patterns $\bf{w}^{\alpha}$ at addresses given by $\bf{x}^{\alpha}$. When both pattern and address space consist of the same length of bits, $N$, there are no restrictions prohibiting $\bf{w}^{\alpha}$ to be an address pointing elsewhere in memory. Thus, if one sets $\bf{w}^{\alpha} = \bf{x}^{\alpha+1}$, we can store data as a linked list and retrieve it sequentially. Below in panel (a) of Figure \ref{sequences} we display example sequences of noisy stimuli. Here, each image of a roman numeral (well, technically zero is not a roman numeral) corresponds to a binary pattern of length $256$ and corrupted by $25$ bits ($\approx 10\%$ noise). When writing these patterns to memory, the next numeral's address was stored as the content for the current numeral's address. Consequently, when this SDM is queried with a corrupted numeral, it retrieves the stored sequence of roman numerals following the queried numeral. Furthermore, as shown in panel (b) of Figure \ref{sequences}, these retrieved addresses correspond to the prototype for each numeral stored as an exemplar (in this particular example, there were $10$ noisy sequences stored in an SDM with $M=10000$).
 
 
 
