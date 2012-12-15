@@ -96,7 +96,7 @@ As motivation for our research, we focus on a particular investigation under thi
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Associative models of memory}
 
-Associative models of memory comprise a set of information processing systems with the aim of storing and retrieving data by learning associations in the data. We consider two models in particular: a Hopfield network, and a Sparse Distributed Memory (SDM) system. We focus on these two models since Hopfield networks were covered in class; providing a foundation for which to compare to, and the mathematics between these two models has been previously presented in a unified framework \cite{Keeler1988}; allowing us to better understand the differences between each.  We present each model in a similar framework below. For a more detailed exploration between these particular associative memory models, refer to \citeA{Keeler1988}, and for an alternative to SDMs that we do not explore (incorporating Hamming distance on binary patterns), please see \citeA{Lippmann1987}.
+Associative models of memory comprise a set of information processing systems with the aim of storing and retrieving data by learning associations in the data. We consider two models in particular: a Hopfield network, and a Sparse Distributed Memory (SDM) system. We focus on these two models since Hopfield networks were covered in class; providing a foundation for which to compare to, and the mathematics between these two models has been previously presented in a unified framework \cite{Keeler1988}; allowing us to better understand the differences between each.  We present each model in a similar framework below. % For a more detailed exploration between these particular associative memory models, refer to \citeA{Keeler1988}, and for an alternative to SDMs that we do not explore (incorporating Hamming distance on binary patterns), please see \citeA{Lippmann1987}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % subsection - Hopfield networks
@@ -166,8 +166,35 @@ More formally, given a set of binary patterns $\bf{p}^{\alpha}$ of length $N$ in
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Exemplar storage in associative memory systems}
 
+Having reviewed the formal descriptions of a Hopfield network and an SDM, we now turn to evaluation of these models using several different
+metrics to gauge their fitness as exemplar storage systems.
 
-\begin{figure}[t!]
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% subsection - capacity
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Storage Capacity}
+
+First, we explored the upper bound of storage capacity of the SDM
+versus the Hopfield network by generating $k$ random, uncorrelated
+inputs, storing them in and then retriving them from the different
+models, and then observing the amount of corruption introduced during
+this procedure. We tested several SDMs with different address space
+sizes, $M\in\{500, 1000, 2500, 5000, 10000\}$ (the Hopfield network
+only has one address space size, i.e. $M=N$).  Panel (a) in Figure
+\ref{fig:capacity} shows the results of this comparison using
+uncorrupted inputs for $k\leq 200$ (number of exemplars). For
+sufficiently large $M$, the SDM easily outperforms the Hopfield
+network.
+
+The SDM and Hopfield network should be able to work with corrupted
+inputs as well. So, we performed the same analysis as above, except
+that we attempted to retrieve each exemplar with a corrupted version
+of itself and compared the SDM with $M=10000$.  Figure \ref{fig:capacity} (b)
+shows these results for different levels of corruption. At low levels
+of corruption, the SDM is more resistant to corrupted inputs than the
+Hopfield net. 
+
+\begin{figure}[h!]
   \begin{center}
     \includegraphics[width=0.9\textwidth]{./figures/all-capacities.png}
     \caption{SDM and Hopfield network capacities. The left plot (a)
@@ -184,33 +211,7 @@ More formally, given a set of binary patterns $\bf{p}^{\alpha}$ of length $N$ in
   \end{center}
 \end{figure}
 
-We compared the Hopfield and SDM models using several different
-metrics to gauge their fitness as exemplar storage systems.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% subsection - capacity
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Storage Capacity}
-
-First, we explored the upper bound of storage capacity of the SDM
-versus the Hopfield network by generating $k$ random, uncorrelated
-inputs, storing them in and then retriving them from the different
-models, and then observing the amount of corruption introduced during
-this procedure. We tested several SDMs with different address space
-sizes, $M\in\{500, 1000, 2500, 5000, 10000\}$ (the Hopfield network
-only has one address space size, i.e. $M=N$).  Figure
-\ref{fig:capacity}a shows the results of this comparison using
-uncorrupted inputs for $k\leq 200$ (number of exemplars). For
-sufficiently large $M$, the SDM easily outperforms the Hopfield
-network.
-
-The SDM and Hopfield network should be able to work with corrupted
-inputs as well. So, we performed the same analysis as above, except
-that we attempted to retrieve each exemplar with a corrupted version
-of itself and compared the SDM with $M=10000$.  \ref{fig:capacity}b
-shows these results for different levels of corruption. At low levels
-of corruption, the SDM is more resistant to corrupted inputs than the
-Hopfield net. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % subsection - prototypes
@@ -222,9 +223,9 @@ Hopfield net.
   \begin{center}
     \begin{tabular}{ l l l c}
       \raisebox{2.5in}{(a)} &
-      \includegraphics[width=0.43\textwidth]{./figures/exemplars.png} &
+      \includegraphics[width=0.41\textwidth]{./figures/exemplars.png} &
       \raisebox{2.5in}{(b)} &
-      \includegraphics[width=0.4\textwidth]{./figures/prototypeResults.png} \\
+      \includegraphics[width=0.38\textwidth]{./figures/prototypeResults.png} \\
       %	\includegraphics[width=0.4\textwidth]{./figures/vi_sdm.png} 
     \end{tabular}
     \caption{(a) Nine noisy exemplars stored in both SDM and Hopfield
@@ -233,44 +234,6 @@ Hopfield net.
     \label{fig:prototypes}
   \end{center}
 \end{figure}
-
-
-One feature of associative memory systems is the ``averaging'' effect:
-as more vectors are stored in the memory, vectors that are close to
-each other may overlap in memory and reading will result in a vector
-that is somewhere in between. Importantly, this is related to a
-property of being able to retrieve a ``prototype'' vector from
-multiple stored ``exemplars''.
-
-Fig. \ref{fig:prototypes}a shows nine exemplars of the ``VI'' roman
-numeral, each with 25 corrupted bits ($\approx10\%$) , which were
-stored in the SDM and Hopfield network. Fig. \ref{fig:prototypes}b
-shows the result of querying each network with another corrupted
-exemplar: both return vectors that approach the true prototype and
-have much less corruption than any of the exemplars. In this
-particular example, the SDM is perfectly able to retrieve the
-prototype.
-
-To more rigorously test the abilities of the Hopfield network and SDM
-to retrieve prototypes, we performed the following steps 100 times:
-first, we generated three uncorrelated prototypes. For each prototype,
-we generated several corrupted exemplars, where the hamming distance
-between each exemplar and the prototype was no more than a specified
-amount of corruption. We stored these exemplars in the Hopfield
-network and SDM ($M=10000$) and then attempted to retrieve the
-prototype by querying with a new corrupted exemplar. We computed the
-amount of corruption in the prototype, and averaged across the 100
-trials. 
-
-Fig. \ref{fig:prototype-comparison} shows the results for different
-numbers of exemplars and different levels of corruption. Both the SDM
-and Hopfield network are able to retrieve near-perfect prototypes for
-corruption of no more than $5\%$ (in the case of the SDM, it is
-accurate even at $10\%$, consistent with the example in
-Fig. \ref{fig:prototypes}). At high levels of corruption and low
-numbers of exemplars, the Hopfield network actually outperforms the
-SDM; however, with more exemplars, the SDM quickly recovers.
-
 
 \begin{figure}[t!]
   \begin{center}
@@ -287,6 +250,55 @@ SDM; however, with more exemplars, the SDM quickly recovers.
   \label{fig:prototype-comparison}
 \end{figure}
 
+One feature of associative memory systems is the ``averaging'' effect:
+as more vectors are stored in the memory, vectors that are close to
+each other may overlap in memory and reading will result in a vector
+that is somewhere in between. Importantly, this is related to a
+property of being able to retrieve a ``prototype'' vector from
+multiple stored ``exemplars''. Panel (a) in Figure \ref{fig:prototypes} shows nine exemplars of the ``VI'' roman numeral, each with 25 corrupted bits ($\approx10\%$) , which were
+stored in the SDM and Hopfield network. Panel (b) in Figure \ref{fig:prototypes}
+shows the result of querying each network with another corrupted
+exemplar: both return vectors that approach the true prototype and
+have much less corruption than any of the exemplars. In this
+particular example, the SDM is perfectly able to retrieve the
+prototype.
+
+To more rigorously test the abilities of the Hopfield network and SDM
+to retrieve prototypes, we performed the following steps 100 times:
+first, we generated three uncorrelated prototypes. For each prototype,
+we generated several corrupted exemplars, where the Hamming distance
+between each exemplar and the prototype was no more than a specified
+amount of corruption. We stored these exemplars in the Hopfield
+network and SDM ($M=10000$) and then attempted to retrieve the
+prototype by querying with a new corrupted exemplar. We computed the
+amount of corruption in the prototype, and averaged across the 100
+trials. 
+
+Figure \ref{fig:prototype-comparison} shows the results for different
+numbers of exemplars and different levels of corruption. Both the SDM
+and Hopfield network are able to retrieve near-perfect prototypes for
+corruption of no more than $5\%$ (in the case of the SDM, it is
+accurate even at $10\%$, consistent with the example in
+Figure \ref{fig:prototypes}). At high levels of corruption and low
+numbers of exemplars, the Hopfield network actually outperforms the
+SDM; however, with more exemplars, the SDM quickly recovers.
+
+
+% \begin{figure}[t!]
+%   \begin{center}
+%     \includegraphics[width=0.95\textwidth]{./figures/prototype-edit.png}
+%   \end{center}
+%   \caption{Prototype reconstruction accuracy for the SDM and Hopfield
+%     network. The left two plots show the accuracy in reconstructing
+%     three uncorrelated prototypes from different numbers of exemplars
+%     with different levels of corruption. The right plot shows the
+%     difference between SDM and Hopfield performance, with white
+%     indicating no difference, blue indicating better performance by
+%     the SDM, and red indicating better performance by the Hopfield
+%     network. In most cases, the SDM outperforms the Hopfield network.}
+%   \label{fig:prototype-comparison}
+% \end{figure}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % subsection - sequences
@@ -294,14 +306,14 @@ SDM; however, with more exemplars, the SDM quickly recovers.
 \subsection{Sequence Storage}
 
 % just to show off here since the hopnet can't at all - but maybe we should make a comment about recurrent nets (JUST a comment) ?
-\begin{figure}[t!]
+\begin{figure}[b!]
   \begin{center}
     \begin{tabular}{ l c }
-      \raisebox{4.1in}{(a)} &
-      \includegraphics[width=0.8\textwidth]{./figures/exemplarStoredSequences.png} \vspace{25bp} 
+      \raisebox{3.5in}{(a)} &
+      \includegraphics[width=0.7\textwidth]{./figures/exemplarStoredSequences.png} \vspace{25bp} 
       \\
-      \raisebox{.6in}{(b)} &
-      \includegraphics[width=0.8\textwidth]{./figures/prototypeRetrievedSequence.png} 
+      \raisebox{.55in}{(b)} &
+      \includegraphics[width=0.7\textwidth]{./figures/prototypeRetrievedSequence.png} 
     \end{tabular}
     \caption{(a) Exemplars of noisy sequences stored in SDM
       memory. (b) Retrieval of prototypical sequence in SDM from a
@@ -329,7 +341,7 @@ network. Interestingly, however, is the capacity when retrieving with
 corrupted inputs or prototype retrivel. At higher levels of noise, the
 SDM is actually more error-prone than the Hopfield network in these
 scenarios. We suspect this is due to an overlap between the corrupted
-input and the hamming radius of a different stored word. More
+input and the Hamming radius of a different stored word. More
 specifically, if we flip exactly $b$ bits, then the word will be
 located along an edge in space that is $b$ bits away from the actual
 stored word in Hamming distance. At $20\%$ corruption, the Hamming
@@ -411,7 +423,7 @@ following constraint:
 \label{eq:w}
 \end{equation}
 
-After writing multiple values $(x_i^*, y)$, the value of the counter
+\noindent After writing multiple values $(x_i^*, y)$, the value of the counter
 associated with address $a_j$ will be:
 \begin{equation}
 C_j=\sum_i w(a_j|x_i^*)y_i
@@ -429,7 +441,7 @@ r(x| a_j)\propto \Pr(x|x^*=a_j)
 \label{eq:r}
 \end{equation}
 
-We weight the counter value $C_j$ for each $a_j$ based on the
+\noindent We weight the counter value $C_j$ for each $a_j$ based on the
 likelihood that $a_j$ is the actual target address. The sum over these
 values is:
 \begin{equation}
@@ -441,7 +453,7 @@ f(x)=\sum_j C_j r(x| a_j)
 % R(x) = 
 % \end{equation}
 
-The expected value of this sum over all addresses $a$ is obtained by
+\noindent The expected value of this sum over all addresses $a$ is obtained by
 substituting Eq. \ref{eq:Cj} into Eq. \ref{eq:R} and simplifying due
 to linearity of expectation:
 \begin{align}
@@ -449,13 +461,13 @@ to linearity of expectation:
 &=\sum_i\ y_i\cdot E_a\left(\sum_j w(a_j| x_i^*)r(x|a_j)\right)
 \end{align}
 
-As our address space grows larger (as in Eq. \ref{eq:w}), this approaches:
+\noindent As our address space grows larger (as in Eq. \ref{eq:w}), this approaches:
 \begin{align}
 \lim_{M\rightarrow 2^N} \mathbb{E}_a[f(x)]&=\sum_i\ y_i \int_a \delta(a-x_i^*)\Pr(x|x^*=a)\ \mathrm{d}a\\
 &= \sum_i\ y_i\Pr(x|x_i*)
 \end{align}
 
-Thus, in the limit, the expected value that we read out will be:
+\noindent Thus, in the limit, the expected value that we read out will be:
 \begin{equation}
 \mathbb{E}[y|x]\propto \sum_i\ y_i\Pr(x|x_i^*)
 \end{equation}
@@ -501,7 +513,7 @@ probabilities.
 % bibliography
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\newpage
+%\newpage
 \bibliographystyle{apacite}
 
 \setlength{\bibleftmargin}{.125in}
