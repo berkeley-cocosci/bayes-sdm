@@ -75,7 +75,7 @@
 % abstract
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{abstract}
-We explore the storage of exemplars in associative memory systems as an initial investigation into neural implementations of psychological processes. We outline a recent proposal that probabilistic models of cognition accounting for human behavior at a computational level of analysis can be approximated by existing psychological process models, namely, \textit{exemplar models}. Given this motivation, the main contribution of this paper consists of analyzing the dynamics and storage capabilities of two associative models of memory: a Hopfield network, and a Sparse Distributed Memory (SDM) system. We describe each model in a common mathematical framework and compare their performance  on storage capacity, retrieving prototypes, and retrieving sequences, using both corrupted and uncorrupted stimuli. Finding SDMs to be more robust and powerful computing machines, we then describe how the mechanics of SDMs can be interpreted probabilistically as a Monte Carlo method called Importance Sampling. We conclude with future directions of this research. 
+We explore the storage of exemplars in associative memory systems as an initial investigation into neural implementations of psychological processes. We first briefly outline a recent proposal that probabilistic models of cognition accounting for human behavior at a computational level of analysis can be approximated by existing psychological process models, namely, \textit{exemplar models}. Given this motivation, the main contribution of this paper consists of analyzing the dynamics and storage capabilities of two associative models of memory: a Hopfield network, and a Sparse Distributed Memory (SDM) system. We describe each model in a common mathematical framework and compare their performance  on storage capacity, retrieving prototypes, and retrieving sequences, using both corrupted and uncorrupted stimuli. Finding SDMs to be more robust and powerful computing machines, we then describe how the mechanics of SDMs can be interpreted probabilistically as a Monte Carlo method called importance sampling. We conclude with future directions of this research. 
 
 % \textbf{Keywords:} 
 % Sparse Distributed Memory systems, Bayesian inference, Exemplar model, Rational Process Model, Importance Sampling.
@@ -86,61 +86,9 @@ We explore the storage of exemplars in associative memory systems as an initial 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction}
 
-How do people make complicated inferences like separating concepts into categories, learning languages, or discovering causal relationships between events, constrained by limited evidence? Probabilistic models of cognition offer one such account of how people do this, with a rapidly growing body of literature supporting their claims \cite{griffiths2010probabilistic,tenenbaum2011grow}. These models provide a \textit{rational analysis} of human inductive inference, answering questions of cognition regarding \textit{why} people behave as they do \cite{marr82,anderson90}. However, traditional models from cognitive psychology focus on answering questions as to \textit{how} cognitive processes support these behaviors \cite{kahneman1972subjective,medin1978context,gigerenzer2000simple}. It remains unclear what psychological mechanisms could be responsible for carrying out the probabilistic computations in rational models. In order to bridge these methods of analyzing cognition, recent work has shown promise in using psychological process models as methods of approximating probabilistic inference \cite{sanborn2010rational,griffiths2012bridging}. As motivation for our research, we focus on a particular investigation under this approach, where an exemplar model of memory was shown to be equivalent to a well known Monte Carlo method known as Importance Sampling \cite{Shi2010}.
+How do people make complicated inferences like separating concepts into categories, learning languages, or discovering causal relationships between events, constrained by limited evidence? Probabilistic models of cognition offer one such account of how people do this, with a rapidly growing body of literature supporting their claims \cite{griffiths2010probabilistic,tenenbaum2011grow}. These models provide a \textit{rational analysis} of human inductive inference, answering questions of cognition regarding \textit{why} people behave as they do \cite{marr82,anderson90}. However, traditional models from cognitive psychology focus on answering questions as to \textit{how} cognitive processes support these behaviors \cite{kahneman1972subjective,gigerenzer2000simple}. It remains unclear what psychological mechanisms could be responsible for carrying out the probabilistic computations in rational models. Furthermore, another line of research focuses on exploring ways to perform probabilistic computations with neural systems, providing answers to questions of cognition at Marr's level of \textit{implementation} \cite{ma2006bayesian}. In order to bridge these different methods of analyzing cognition, recent work has shown promise in using psychological process models as methods of approximating probabilistic inference \cite{Shi2010,sanborn2010rational,griffiths2012bridging} and using neural architectures to implement these computations \cite{Shi2009}. 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% subsection - exemplar models / IS for Bayes 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Exemplar models and Bayesian inference}
-
-% maybe start with a simple example of exemplar models like Lei does.. 
-
-% what is an exemplar model
-% In an \textit{exemplar model} model of memory, people store individual instances of observations in memory (as an \textit{exemplar}) and evaluate new observations by activating these stored exemplars as a function of their similarity to this novel event \cite{medin1978context,nosofsky1986attention}. More formally, let $X^{*} = \{ x^{*}_{1}, x^{*}_{2}, \ldots, x^{*}_{n} \}$ represent a set of $n$ stored exemplars, and define $s(x,x^{*})$ to be a similarity function measuring the distance between an observation $x$ and a stored exemplar $x^{*}$. 
-
-% -- i dont know if i like the above, i'm too tired..
-
-% something about an identification task
-
-\begin{equation}
-	p_{r}(x^{*}_{i}|x)=\frac{s(x,x^{*}_{i})}{\sum^{n}_{j=1}s(x,x^{*}_{j})}
-\end{equation}
-
-% something about exemp models can do prob. categorization
-\cite{ashby1995categorization}
-
-% however a more general form of exemp models is
-
-\begin{equation}
-	\hat{f}(x)=\frac{\sum^{n}_{j=1}f_{j}\,s(x,x^{*}_{j})}{\sum^{n}_{j=1}s(x,x^{*}_{j})}
-\end{equation}
-
-% very brief bayes
-
-% very brief intro to importance sampling
-
-\cite{neal1993probabilistic,Shi2010}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% subsection - previous implementations: RBFs
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Neural implementations of Importance Sampling}
-\cite{Shi2009}
-
-% review Lei's components of an importance sampler
-
-% math of RBF
-
-% *** interesting because the RBF network is not cognitively satisfying \\
-% **** all grandmother cells (and the proposed spiking neuron model was using an RBF too..) \\
-% **** not robust \\
-
-
-% what is an associative memory model
-
-% something about distributed memory
-
-% the rest of the paper explores the role of exemplars and associative memory
+As motivation for our research, we focus on a particular investigation under this recent \textit{rational process model} approach, which uses an exemplar model of memory. It has been proposed that people store individual instances of observations in memory (as an \textit{exemplar}) and evaluate new observations by activating these exemplars as a function of their similarity to this novel event \cite{medin1978context,nosofsky1986attention}. \citeA{Shi2010} showed that this model of memory was formally equivalent to an importance sampler approximation of Bayesian inference. Here, the set of exemplars corresponds to a set of samples from a prior distribution. It has been further shown that this idea can be implemented with a Radial Basis Function (RBF) network \cite{Shi2009}. While this RBF implementation is an interesting proof-of-concept, it is not cognitively satisfying since each neuron in the model corresponds to a single exemplar; an extreme interpretation of the ``grandmother cell hypothesis''. In this paper, we set out to explore how exemplars are stored in associative models of memory as an alternative implementation of importance sampling. The plan of the paper is as follows. We first explore the mechanics behind two models of associative memory: a Hopfield network, and a Sparse Distributed Memory (SDM) system. We then analyze how well these models can store and retrieve patterns in memory. We then present how an SDM might perform importance sampling through a probabilistic interpretation of its read and write rules. Finally, we conclude the paper with our future directions for extending this research.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -148,7 +96,7 @@ How do people make complicated inferences like separating concepts into categori
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Associative models of memory}
 
-Associative models of memory comprise a set of information processing systems with the aim of storing and retrieving data through finding associations in similar patterns of data. We consider two models in particular: a Hopfield network, and a Sparse Distributed Memory (SDM) system. We focus on these two models since Hopfield networks were covered in class; providing a foundation for which to compare to, and the mathematics between these two models has been previously presented in a unified framework \cite{Keeler1988}; allowing us to better understand the differences between each.  We present each model in a similar framework below. For a more detailed exploration between these particular associative memory models, refer to \citeA{Keeler1988}, and for an alternative to SDMs that we do not explore (incorporating Hamming distance on binary patterns), please see \citeA{Lippmann1987}.
+Associative models of memory comprise a set of information processing systems with the aim of storing and retrieving data by learning associations in the data. We consider two models in particular: a Hopfield network, and a Sparse Distributed Memory (SDM) system. We focus on these two models since Hopfield networks were covered in class; providing a foundation for which to compare to, and the mathematics between these two models has been previously presented in a unified framework \cite{Keeler1988}; allowing us to better understand the differences between each.  We present each model in a similar framework below. For a more detailed exploration between these particular associative memory models, refer to \citeA{Keeler1988}, and for an alternative to SDMs that we do not explore (incorporating Hamming distance on binary patterns), please see \citeA{Lippmann1987}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % subsection - Hopfield networks
@@ -364,7 +312,7 @@ SDM; however, with more exemplars, the SDM quickly recovers.
 
 Hopfield networks typically function only as autoassociative memory systems, whereas SDMs can associate one pattern with another, acting as a heteroassociative memory. We demonstrate this capability in an SDM by storing and retrieving temporal sequences of patterns.
 
-SDM storage consists of writing and reading binary patterns $\bf{w}^{\alpha}$ at addresses given by $\bf{x}^{\alpha}$. When both pattern and address space consist of the same length of bits, $N$, there are no restrictions prohibiting $\bf{w}^{\alpha}$ to be an address pointing elsewhere in memory. Thus, if one sets $\bf{w}^{\alpha} = \bf{x}^{\alpha+1}$, we can store data as a linked list and retrieve it sequentially. Below in panel (a) of Figure \ref{sequences} we display example sequences of noisy stimuli. Here, each image of a roman numeral (well, technically zero is not a roman numeral) corresponds to a binary pattern of length $256$ and corrupted by $25$ bits ($\approx 10\%$ noise). When writing these patterns to memory, the next numeral's address was stored as the content for the current numeral's address. When this SDM is queried with a corrupted numeral, it retrieves the stored sequence of roman numerals following the queried numeral. Furthermore, as shown in panel (b) of Figure \ref{sequences}, these retrieved addresses correspond to the prototype for each numeral stored as an exemplar (in this particular example, there were $10$ noisy sequences stored in an SDM with $M=10,000$).
+SDM storage consists of writing and reading binary patterns $\bf{w}^{\alpha}$ at addresses given by $\bf{x}^{\alpha}$. When both pattern and address space consist of the same length of bits, $N$, there are no restrictions prohibiting $\bf{w}^{\alpha}$ to be an address pointing elsewhere in memory. Thus, if one sets $\bf{w}^{\alpha} = \bf{x}^{\alpha+1}$, we can store data as a linked list and retrieve it sequentially. Below in panel (a) of Figure \ref{sequences} we display example sequences of noisy stimuli. Here, each image of a roman numeral (well, technically zero is not a roman numeral) corresponds to a binary pattern of length $256$ and corrupted by $25$ bits ($\approx 10\%$ noise). When writing these patterns to memory, the next numeral's address was stored as the content for the current numeral's address. Consequently, when this SDM is queried with a corrupted numeral, it retrieves the stored sequence of roman numerals following the queried numeral. Furthermore, as shown in panel (b) of Figure \ref{sequences}, these retrieved addresses correspond to the prototype for each numeral stored as an exemplar (in this particular example, there were $10$ noisy sequences stored in an SDM with $M=10,000$).
 
 
 
@@ -520,7 +468,7 @@ Thus, in the limit, the expected value that we read out will be:
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  conclusions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Conclusions}
+\section{Conclusions and Future Work}
 
 In this paper, we compared two associative memory systems: Hopfield
 networks and Sparse Distributed Memory (SDM). We found that the SDM
