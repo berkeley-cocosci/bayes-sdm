@@ -166,8 +166,11 @@ More formally, given a set of binary patterns $\bf{p}^{\alpha}$ of length $N$ in
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Exemplar storage in associative memory systems}
 
-Having reviewed the formal descriptions of a Hopfield network and an SDM, we now turn to evaluation of these models using several different
-metrics to gauge their fitness as exemplar storage systems.
+Having reviewed the formal descriptions of a Hopfield network and an
+SDM, we now turn to evaluation of these models using several different
+metrics to gauge their fitness as exemplar storage systems. In all
+analyses, we used an address length of $N=256$ and, for the SDM, a
+Hamming radius of $D=112$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % subsection - capacity
@@ -175,24 +178,24 @@ metrics to gauge their fitness as exemplar storage systems.
 \subsection{Storage Capacity}
 
 First, we explored the upper bound of storage capacity of the SDM
-versus the Hopfield network by generating $k$ random, uncorrelated
-inputs, storing them in and then retriving them from the different
-models, and then observing the amount of corruption introduced during
-this procedure. We tested several SDMs with different address space
-sizes, $M\in\{500, 1000, 2500, 5000, 10000\}$ (the Hopfield network
-only has one address space size, i.e. $M=N$).  Panel (a) in Figure
-\ref{fig:capacity} shows the results of this comparison using
-uncorrupted inputs for $k\leq 200$ (number of exemplars). For
+versus the Hopfield network by generating random, uncorrelated inputs,
+storing them in and then retriving them from the different models, and
+then observing the amount of corruption introduced during this
+procedure. We tested several SDMs with different address space sizes,
+$M\in\{500, 1000, 2500, 5000, 10000\}$ (the Hopfield network only has
+one address space size, i.e. $M=N$).  Panel (a) in Figure
+\ref{fig:capacity} shows the average results of performing this
+comparison 100 times for different numbers of stored words. With
 sufficiently large $M$, the SDM easily outperforms the Hopfield
 network.
 
 The SDM and Hopfield network should be able to work with corrupted
 inputs as well. So, we performed the same analysis as above, except
 that we attempted to retrieve each exemplar with a corrupted version
-of itself and compared the SDM with $M=10000$.  Figure \ref{fig:capacity} (b)
-shows these results for different levels of corruption. At low levels
-of corruption, the SDM is more resistant to corrupted inputs than the
-Hopfield net. 
+of itself and compared the SDM with $M=10000$.  Figure
+\ref{fig:capacity} (b) shows these results for different levels of
+corruption. At low levels of corruption, the SDM is more resistant to
+corrupted inputs than the Hopfield net.
 
 \begin{figure}[h!]
   \begin{center}
@@ -254,13 +257,18 @@ One feature of associative memory systems is the ``averaging'' effect:
 as more vectors are stored in the memory, vectors that are close to
 each other may overlap in memory and reading will result in a vector
 that is somewhere in between. Importantly, this is related to a
-property of being able to retrieve a ``prototype'' vector from
-multiple stored ``exemplars''. Panel (a) in Figure \ref{fig:prototypes} shows nine exemplars of the ``VI'' roman numeral, each with 25 corrupted bits ($\approx10\%$) , which were
-stored in the SDM and Hopfield network. Panel (b) in Figure \ref{fig:prototypes}
-shows the result of querying each network with another corrupted
-exemplar: both return vectors that approach the true prototype and
-have much less corruption than any of the exemplars. In this
-particular example, the SDM is perfectly able to retrieve the
+property of being able to retrieve a \textit{prototype} vector from
+multiple stored \textit{exemplars}. By prototype, we refer to an
+unobserved ``ideal'' input. Exemplars are corrupted (or atypical)
+observations of this input.
+
+Panel (a) in Figure \ref{fig:prototypes} shows nine exemplars of the
+``VI'' roman numeral, each with 25 corrupted bits ($\approx10\%$) ,
+which were stored in the SDM and Hopfield network. Panel (b) in Figure
+\ref{fig:prototypes}b shows the result of querying each network with
+another corrupted exemplar: both return vectors that approach the true
+prototype and have much less corruption than any of the exemplars. In
+this particular example, the SDM is perfectly able to retrieve the
 prototype.
 
 To more rigorously test the abilities of the Hopfield network and SDM
@@ -433,9 +441,9 @@ C_j=\sum_i w(a_j|x_i^*)y_i
 \subsection{Reading}
 
 We are given an address $x$, which as before is a corrupted version of
-$x^*$; the goal is to read the value stored at $x^*$. We can define
-reading distribution as the likelihood that $x$ was generated from
-some $a_j$:
+$x^*$; the goal is to read the value stored at $x^*$. We can define a
+reading density as the likelihood that $x$ was generated from some
+$a_j$:
 \begin{equation}
 r(x| a_j)\propto \Pr(x|x^*=a_j)
 \label{eq:r}
@@ -454,7 +462,7 @@ f(x)=\sum_j C_j r(x| a_j)
 % \end{equation}
 
 \noindent The expected value of this sum over all addresses $a$ is obtained by
-substituting Eq. \ref{eq:Cj} into Eq. \ref{eq:R} and simplifying due
+substituting Eq. \ref{eq:Cj} into Eq. \ref{eq:R} and simplifying according
 to linearity of expectation:
 \begin{align}
 \mathbb{E}_a[f(x)]&=\mathbb{E}_a\left[\sum_j\left(\sum_i w(a_j| x_i^*)y_i\right)r(x|a_j)\right]\\
@@ -508,6 +516,26 @@ function? If it is, this would make importance sampling in a SDM much
 more flexible and generic by not requiring a change in read
 probabilities.
 
+Another area of future work is quantifying the extent to which
+corruption hinders the SDM. We found that in certain cases --
+particularly when the amount of corruption in the input is high -- the
+SDM has poorer accuracy than the Hopfield network. We provided an
+explanation for why this might be, but a more rigorous exploration of
+such phenomena is necessary to understand the SDM's computational
+constraints.
+
+Through this project, we have made several contributions to the
+understanding of associative memory and its interface with
+computational-level models. Our first contribution was to motivate a
+rational algorithmic-level model of exemplar memory using associative
+networks. Our second contribution was to empirically compare two
+associative memory systems, Hopfield networks and SDMs, as models for
+exemplar storage. Finally, our third contribution was to
+mathematically formalize a form of approximate Bayesian inference --
+importance sampling -- in the context of the SDM. We believe the SDM
+is a promising framework for exploring rational process models and
+look forward to future collaborations with the Redwood Neuroscience
+Institute extending the work presented here.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % bibliography
